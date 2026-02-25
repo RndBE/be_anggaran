@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['permission:reports.view'])->group(function () {
         Route::get('/reports/export', [ReportController::class, 'exportCsv'])->name('reports.export');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     });
 });
 

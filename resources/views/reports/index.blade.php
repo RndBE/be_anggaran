@@ -35,11 +35,12 @@
                                     </th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status
                                     </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($requests as $req)
-                                    <tr>
+                                    <tr class="hover:bg-gray-50 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             REQ-{{ str_pad($req->id, 4, '0', STR_PAD_LEFT) }}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -57,6 +58,12 @@
                                         <td
                                             class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 uppercase font-mono text-xs">
                                             {{ $req->status }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <a href="{{ route('reports.show', $req) }}"
+                                                class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">
+                                                Detail →
+                                            </a>
                                         </td>
                                     </tr>
                                 @endforeach

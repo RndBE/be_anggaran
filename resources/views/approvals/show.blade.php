@@ -69,7 +69,31 @@
                             Action</h3>
 
                         @auth
-                            @if(Auth::user()->hasRole($approval->step->role->slug))
+                            @php
+                                $step = $approval->step;
+                                $authUser = Auth::user();
+
+                                if ($step->isDivisionLevel()) {
+                                    // Division-level: user harus dari divisi yang sama + level <= required_level
+                                    $requesterDivId = $approval->request->user->division_id;
+                                    $canAct = $authUser->division_id === $requesterDivId
+                                        && $authUser->level !== null
+                                        && $authUser->level <= $step->required_level;
+                                } elseif ($step->isRoleLevel()) {
+                                    $canAct = $step->role !== null
+                                        && $authUser->hasRole($step->role->slug)
+                                        && $authUser->level !== null
+                                        && $authUser->level <= $step->required_level;
+                                } else {
+                                    $canAct = $step->role !== null && $authUser->hasRole($step->role->slug);
+                                }
+
+                                $stepLabel = $step->isDivisionLevel()
+                                    ? 'Level ≤ ' . $step->required_level . ' (Divisi)'
+                                    : ($step->role?->name ?? '—');
+                            @endphp
+
+                            @if($canAct)
                                 <form action="{{ route('approvals.update', $approval->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
@@ -77,8 +101,8 @@
                                     <div class="mb-4">
                                         <label class="block text-sm font-bold text-gray-700 mb-2">Step Designation</label>
                                         <div class="p-2 bg-white rounded border text-sm font-mono text-gray-800">
-                                            Role Needed: {{ $approval->step->role->name }}
-                                            (Step {{ $approval->step->step_order }})
+                                            {{ $stepLabel }}
+                                            (Step {{ $step->step_order }})
                                         </div>
                                     </div>
 

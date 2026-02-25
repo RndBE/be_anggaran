@@ -11,16 +11,15 @@ class WhatsAppController extends Controller
     {
     }
 
-    /** Dashboard halaman koneksi WhatsApp */
+    /** Dashboard halaman koneksi WhatsApp — tidak ada blocking call, Alpine.js poll sendiri */
     public function index()
     {
         $session = config('whatsapp.session', 'beacon');
-        $status = $this->wa->getStatus($session);
 
         return view('settings.whatsapp', [
             'session' => $session,
-            'status' => $status['data']['status'] ?? 'UNKNOWN',
-            'statusData' => $status['data'] ?? [],
+            'status' => 'LOADING',  // Alpine poll langsung saat init()
+            'statusData' => [],
             'qrImageUrl' => $this->wa->qrImageUrl($session),
             'baseUrl' => config('whatsapp.base_url'),
         ]);

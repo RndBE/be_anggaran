@@ -210,6 +210,7 @@
 
                 init() {
                     this.updateTimeAgo();
+                    this.poll();  // langsung poll saat halaman selesai load
                     this._pollTimer = setInterval(() => this.poll(), 10000);
                     setInterval(() => this.updateTimeAgo(), 5000);
                 },

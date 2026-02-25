@@ -106,6 +106,24 @@
                                 </div>
                             </div>
 
+                            {{-- ── Peserta Dinas ──────────────────────────── --}}
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-gray-700 mb-1">
+                                    👥 Peserta Dinas
+                                    <span class="text-gray-400 font-normal text-xs ml-1">(opsional – pilih karyawan yang ikut)</span>
+                                </label>
+                                <select id="participants-select" name="participants[]" multiple
+                                    placeholder="Cari nama karyawan…"
+                                    class="w-full">
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('participants.*')
+                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
                             <!-- Items Builder -->
                             <div class="bg-blue-50 p-4 rounded border border-blue-100">
                                 <div class="flex justify-between items-center mb-4 border-b border-blue-200 pb-2">
@@ -133,6 +151,7 @@
                                                 <label class="block text-xs font-bold text-gray-700 mb-1">Item
                                                     Type</label>
                                                 <select x-bind:name="`items[${index}][type]`" x-model="item.type"
+                                                    @change="onTypeChange(item)"
                                                     class="w-full text-sm rounded border-gray-300 p-1" required>
                                                     <option value="transport">Transport (Toll, Travel)</option>
                                                     <option value="hotel">Hotel</option>
@@ -145,8 +164,11 @@
                                                 <label class="block text-xs font-bold text-gray-700 mb-1">Amount
                                                     (Rp)</label>
                                                 <input type="number" x-bind:name="`items[${index}][amount]`"
-                                                    x-model="item.amount"
+                                                    x-model="item.amount" :readonly="item.type === 'lumpsum'"
+                                                    :class="item.type === 'lumpsum' ? 'bg-gray-100 cursor-not-allowed' : ''"
                                                     class="w-full text-sm rounded border-gray-300 p-1" min="0" required>
+                                                <p x-show="item.type === 'lumpsum'"
+                                                    class="text-xs text-blue-500 mt-0.5">Otomatis terhitung ↓</p>
                                             </div>
                                         </div>
 
@@ -154,7 +176,67 @@
                                             <label class="block text-xs font-bold text-gray-700 mb-1">Details (e.g. from
                                                 A to B)</label>
                                             <input type="text" x-bind:name="`items[${index}][description]`"
+                                                x-model="item.description"
                                                 class="w-full text-sm rounded border-gray-300 p-1" required>
+                                        </div>
+
+                                        {{-- ── Lumpsum Sub-form ─────────────────────── --}}
+                                        <div x-show="item.type === 'lumpsum'"
+                                            class="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200 space-y-3">
+                                            <p class="text-xs font-bold text-blue-700 mb-2">🍽️ Kalkulasi Uang Makan</p>
+
+                                            {{-- Zona --}}
+                                            <div>
+                                                <label class="block text-xs font-bold text-gray-700 mb-1">Zona
+                                                    Perjalanan</label>
+                                                <select x-bind:name="`items[${index}][travel_zone_id]`"
+                                                    x-model="item.travel_zone_id" @change="calcLumpsum(item)"
+                                                    class="w-full text-sm rounded border-gray-300 p-1">
+                                                    <option value="">— Pilih zona —</option>
+                                                    @foreach($travelZones as $zone)
+                                                        <option value="{{ $zone->id }}"
+                                                            data-rate="{{ $zone->meal_allowance }}">
+                                                            Zona {{ $zone->zone }} — {{ $zone->name }}
+                                                            (Rp
+                                                            {{ number_format($zone->meal_allowance, 0, ',', '.') }}/hari)
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            {{-- Orang & Hari --}}
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div>
+                                                    <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah
+                                                        Orang</label>
+                                                    <input type="number" x-bind:name="`items[${index}][person_count]`"
+                                                        x-model="item.person_count" @input="calcLumpsum(item)" min="1"
+                                                        placeholder="1"
+                                                        class="w-full text-sm rounded border-gray-300 p-1">
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-bold text-gray-700 mb-1">Jumlah
+                                                        Hari</label>
+                                                    <input type="number" x-bind:name="`items[${index}][day_count]`"
+                                                        x-model="item.day_count" @input="calcLumpsum(item)" min="1"
+                                                        placeholder="1"
+                                                        class="w-full text-sm rounded border-gray-300 p-1">
+                                                </div>
+                                            </div>
+
+                                            {{-- Result preview --}}
+                                            <div x-show="item.amount > 0"
+                                                class="flex items-center justify-between bg-white rounded p-2 border border-blue-200">
+                                                <span class="text-xs text-gray-500">
+                                                    Rp <span x-text="formatZoneRate(item)"></span>/hari
+                                                    × <span x-text="item.person_count || 1"></span> orang
+                                                    × <span x-text="item.day_count || 1"></span> hari
+                                                </span>
+                                                <span class="font-bold text-blue-700 text-sm">
+                                                    = Rp <span
+                                                        x-text="new Intl.NumberFormat('id-ID').format(item.amount)"></span>
+                                                </span>
+                                            </div>
                                         </div>
 
                                         <!-- Only show attachment for reimbursement -->
@@ -199,20 +281,73 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('requestForm', () => ({
                 requestType: 'budget',
+                travelZones: @json($travelZones),
                 items: [
-                    { type: 'transport', amount: 0, description: '' }
+                    { type: 'transport', amount: 0, description: '', travel_zone_id: '', person_count: 1, day_count: 1 }
                 ],
+
                 addItem() {
-                    this.items.push({ type: 'transport', amount: 0, description: '' });
+                    this.items.push({
+                        type: 'transport', amount: 0, description: '',
+                        travel_zone_id: '', person_count: 1, day_count: 1
+                    });
                 },
+
                 removeItem(index) {
                     this.items.splice(index, 1);
                 },
+
+                onTypeChange(item) {
+                    if (item.type === 'lumpsum') {
+                        item.travel_zone_id = '';
+                        item.person_count = 1;
+                        item.day_count = 1;
+                        item.amount = 0;
+                    }
+                },
+
+                calcLumpsum(item) {
+                    if (item.type !== 'lumpsum') return;
+                    const zone = this.travelZones.find(z => z.id == item.travel_zone_id);
+                    const rate = zone ? parseFloat(zone.meal_allowance) : 0;
+                    const orang = parseInt(item.person_count) || 1;
+                    const hari = parseInt(item.day_count) || 1;
+                    item.amount = rate * orang * hari;
+                },
+
+                formatZoneRate(item) {
+                    const zone = this.travelZones.find(z => z.id == item.travel_zone_id);
+                    const rate = zone ? parseFloat(zone.meal_allowance) : 0;
+                    return new Intl.NumberFormat('id-ID').format(rate);
+                },
+
                 calculateTotal() {
                     const total = this.items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-                    return new Intl.NumberFormat('id-ID').format(total); // using 'id-ID' for indonesian Rp numbering
+                    return new Intl.NumberFormat('id-ID').format(total);
                 }
             }));
         });
     </script>
+
+    {{-- Tom Select — searchable multi-select untuk peserta dinas --}}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new TomSelect('#participants-select', {
+                plugins: ['remove_button', 'clear_button'],
+                placeholder: 'Cari nama karyawan…',
+                maxItems: null,
+                create: false,
+                sortField: { field: 'text', direction: 'asc' },
+                render: {
+                    option: (data, escape) =>
+                        `<div class="py-1 px-2 text-sm">${escape(data.text)}</div>`,
+                    item: (data, escape) =>
+                        `<div class="text-sm">${escape(data.text)}</div>`,
+                }
+            });
+        });
+    </script>
+
 </x-app-layout>

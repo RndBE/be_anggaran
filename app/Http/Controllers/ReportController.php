@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Request as BudgetRequest;
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalStep;
 
 class ReportController extends Controller
 {
@@ -12,6 +13,30 @@ class ReportController extends Controller
     {
         $requests = BudgetRequest::with(['user', 'clientCode'])->latest()->get();
         return view('reports.index', compact('requests'));
+    }
+
+    public function show(BudgetRequest $report)
+    {
+        $report->load([
+            'user.division',
+            'clientCode',
+            'items',
+            'attachments',
+            'approvals.step.role',
+            'approvals.approver',
+            'participants',
+        ]);
+
+        // Determine which flow was used
+        $flowId = $report->approvals->first()?->step?->approval_flow_id;
+        $allSteps = $flowId
+            ? ApprovalStep::with('role')->where('approval_flow_id', $flowId)->orderBy('step_order')->get()
+            : collect();
+
+        // Map approvals by step id for quick lookup
+        $approvalsByStep = $report->approvals->keyBy('approval_step_id');
+
+        return view('reports.show', compact('report', 'allSteps', 'approvalsByStep'));
     }
 
     public function exportCsv()

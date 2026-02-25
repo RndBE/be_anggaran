@@ -63,7 +63,11 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             <span
                                                 class="bg-yellow-100 text-yellow-800 text-xs font-semibold px-2 py-1 rounded">
-                                                {{ $approval->step->role->name }}
+                                                @if($approval->step->isDivisionLevel())
+                                                    Level ≤ {{ $approval->step->required_level }} (Divisi)
+                                                @else
+                                                    {{ $approval->step->role?->name ?? '—' }}
+                                                @endif
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">

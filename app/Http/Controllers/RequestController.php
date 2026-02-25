@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Request as BudgetRequest;
 use App\Models\RequestItem;
 use App\Models\ClientCode;
+use App\Models\TravelZone;
+use App\Models\User;
 use App\Models\Approval;
 use App\Services\CodeGeneratorService;
 use App\Services\WorkflowService;
@@ -37,7 +39,9 @@ class RequestController extends Controller
     public function create()
     {
         $clientCodes = ClientCode::all();
-        return view('requests.create', compact('clientCodes'));
+        $travelZones = TravelZone::orderBy('zone')->get();
+        $users = User::orderBy('name')->get(['id', 'name']);
+        return view('requests.create', compact('clientCodes', 'travelZones', 'users'));
     }
 
     public function store(Request $request)
@@ -50,6 +54,8 @@ class RequestController extends Controller
             'items.*.type' => 'required|string',
             'items.*.amount' => 'required|numeric|min:0',
             'surat_tugas' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'participants' => 'nullable|array',
+            'participants.*' => 'exists:users,id',
         ]);
 
         DB::beginTransaction();
@@ -80,6 +86,12 @@ class RequestController extends Controller
                     'type' => $itemData['type'],
                     'description' => $itemData['description'] ?? '',
                     'amount' => $itemData['amount'],
+                    'travel_zone_id' => ($itemData['type'] === 'lumpsum' && !empty($itemData['travel_zone_id']))
+                        ? $itemData['travel_zone_id'] : null,
+                    'person_count' => ($itemData['type'] === 'lumpsum' && !empty($itemData['person_count']))
+                        ? (int) $itemData['person_count'] : null,
+                    'day_count' => ($itemData['type'] === 'lumpsum' && !empty($itemData['day_count']))
+                        ? (int) $itemData['day_count'] : null,
                 ]);
 
                 // Handle file uploads
@@ -106,6 +118,11 @@ class RequestController extends Controller
                     'file_path' => $path,
                     'file_type' => 'surat_tugas',
                 ]);
+            }
+
+            // Sync participants (karyawan yang ikut dinas)
+            if ($request->filled('participants')) {
+                $budgetRequest->participants()->sync($request->participants);
             }
 
             // Kickoff workflow

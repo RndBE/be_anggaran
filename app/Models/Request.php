@@ -37,4 +37,9 @@ class Request extends Model
     {
         return $this->hasMany(Payment::class);
     }
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class, 'request_participants')->withTimestamps();
+    }
 }
