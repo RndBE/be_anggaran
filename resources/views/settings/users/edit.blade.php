@@ -1,58 +1,53 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Edit User: <span class="font-normal text-indigo-600">{{ $user->name }}</span>
-            </h2>
-            <a href="{{ route('settings.users.index') }}" class="text-sm text-gray-500 hover:text-gray-700">← Kembali</a>
+        <div class="flex items-center gap-3">
+            <a href="{{ route('settings.users.index') }}" class="text-muted-foreground hover:text-foreground transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </a>
+            <div>
+                <h2 class="text-xl font-bold text-foreground">Edit User</h2>
+                <p class="text-sm text-muted-foreground font-medium">{{ $user->name }}</p>
+            </div>
         </div>
     </x-slot>
 
-    <div class="py-5">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-6">
+        <div class="max-w-2xl mx-auto sm:px-6 lg:px-8">
 
             @if($errors->any())
-                <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                    <ul class="list-disc list-inside space-y-1">
+                <div class="alert-destructive mb-4">
+                    <ul class="list-disc pl-4 space-y-1 text-sm">
                         @foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach
                     </ul>
                 </div>
             @endif
 
-            <div class="bg-white shadow sm:rounded-lg p-6 sm:px-8 py-3">
-                <form method="POST" action="{{ route('settings.users.update', $user) }}"
-                    class="space-y-4" enctype="multipart/form-data">
+            <div class="card p-6">
+                <form method="POST" action="{{ route('settings.users.update', $user) }}" class="space-y-5" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
 
-                    {{-- Name --}}
-                    <div>
-                        <x-input-label for="name" :value="__('Nama Lengkap')" />
-                        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"
-                            value="{{ old('name', $user->name) }}" required autofocus />
+                    <div class="form-group">
+                        <x-input-label for="name">Nama Lengkap</x-input-label>
+                        <x-text-input id="name" name="name" type="text" :value="old('name', $user->name)" required autofocus />
                     </div>
 
-                    {{-- Email & Password --}}
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="email" :value="__('Email')" />
-                            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full"
-                                value="{{ old('email', $user->email) }}" required />
+                        <div class="form-group">
+                            <x-input-label for="email">Email</x-input-label>
+                            <x-text-input id="email" name="email" type="email" :value="old('email', $user->email)" required />
                         </div>
-                        <div>
-                            <x-input-label for="password" :value="__('Password Baru')" />
-                            <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
-                                placeholder="Kosongkan jika tidak ingin diubah" />
-                            <p class="mt-1 text-xs text-gray-400">Isi hanya jika ingin mengganti password.</p>
+                        <div class="form-group">
+                            <x-input-label for="password">Password Baru</x-input-label>
+                            <x-text-input id="password" name="password" type="password" placeholder="Kosongkan jika tidak ingin diubah" />
+                            <p class="text-xs text-muted-foreground mt-1">Isi hanya jika ingin mengganti password.</p>
                         </div>
                     </div>
 
-                    {{-- Division & Level --}}
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <x-input-label for="division_id" :value="__('Divisi')" />
-                            <select id="division_id" name="division_id"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                        <div class="form-group">
+                            <x-input-label for="division_id">Divisi</x-input-label>
+                            <select id="division_id" name="division_id" class="select-input">
                                 <option value="">— Tidak ada divisi —</option>
                                 @foreach($divisions as $division)
                                     <option value="{{ $division->id }}"
@@ -62,10 +57,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div>
-                            <x-input-label for="level" :value="__('Level Jabatan')" />
-                            <select id="level" name="level"
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                        <div class="form-group">
+                            <x-input-label for="level">Level Jabatan</x-input-label>
+                            <select id="level" name="level" class="select-input">
                                 <option value="">— Tidak ada —</option>
                                 @foreach([4 => 'Level 4 (Staff/Pengaju)', 3 => 'Level 3 (Supervisor)', 2 => 'Level 2 (Manager)', 1 => 'Level 1 (Director)'] as $val => $label)
                                     <option value="{{ $val }}" {{ old('level', $user->level) == $val ? 'selected' : '' }}>{{ $label }}</option>
@@ -74,40 +68,33 @@
                         </div>
                     </div>
 
-                    {{-- Signature --}}
-                    <div>
-                        <x-input-label for="signature" :value="__('Tanda Tangan')" />
+                    <div class="form-group">
+                        <x-input-label>Tanda Tangan</x-input-label>
                         @if($user->signature)
-                            <div class="mt-2 mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200 inline-flex flex-col items-center gap-2">
-                                <img src="{{ asset('storage/' . $user->signature) }}"
-                                    alt="Tanda tangan {{ $user->name }}"
-                                    class="h-20 object-contain">
-                                <span class="text-xs text-gray-400">Tanda tangan saat ini</span>
+                            <div class="mt-2 mb-3 p-3 bg-muted/30 rounded-lg border border-border inline-flex flex-col items-center gap-2">
+                                <img src="{{ asset('storage/' . $user->signature) }}" alt="Tanda tangan {{ $user->name }}" class="h-16 object-contain">
+                                <span class="text-xs text-muted-foreground">Tanda tangan saat ini</span>
                             </div>
                         @endif
-                        <div class="flex items-center gap-3 mt-1 border border-dashed border-gray-300 rounded-lg p-3 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
+                        <div class="flex items-center gap-3 border-2 border-dashed border-border rounded-lg p-3 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer"
                             onclick="document.getElementById('signature').click()">
-                            <svg class="w-7 h-7 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            <svg class="w-6 h-6 text-muted-foreground shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
                             </svg>
-                            <span class="text-sm text-gray-500" id="sig_label">
+                            <span class="text-sm text-muted-foreground" id="sig_label">
                                 {{ $user->signature ? 'Ganti tanda tangan…' : 'Pilih file tanda tangan…' }}
                             </span>
                         </div>
-                        <input type="file" id="signature" name="signature"
-                            accept=".jpg,.jpeg,.png,.gif,.svg"
-                            class="hidden"
+                        <input type="file" id="signature" name="signature" accept=".jpg,.jpeg,.png,.gif,.svg" class="hidden"
                             onchange="document.getElementById('sig_label').textContent = this.files[0]?.name ?? '...'">
-                        <p class="mt-1 text-xs text-gray-400">JPG, PNG, SVG · Maks 2 MB. Kosongkan untuk tidak mengubah.</p>
+                        <p class="text-xs text-muted-foreground mt-1">JPG, PNG, SVG · Maks 2 MB.</p>
                         @error('signature')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <x-input-error :messages="[$message]" />
                         @enderror
                     </div>
 
-                    {{-- Roles --}}
-                    <div>
-                        <x-input-label :value="__('Assign Roles')" />
+                    <div class="form-group">
+                        <x-input-label>Assign Roles</x-input-label>
                         <div class="mt-2 space-y-2">
                             @foreach($roles as $role)
                                 @php
@@ -115,25 +102,23 @@
                                         ? in_array($role->id, old('roles', []))
                                         : $user->roles->contains($role->id);
                                 @endphp
-                                <label class="flex items-center gap-3 p-2.5 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer
-                                    {{ $checked ? 'bg-indigo-50 border-indigo-300' : '' }}">
+                                <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors
+                                    {{ $checked ? 'bg-primary/5 border-primary/30' : 'border-border hover:bg-accent' }}">
                                     <input type="checkbox" name="roles[]" value="{{ $role->id }}"
                                         {{ $checked ? 'checked' : '' }}
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                        class="rounded border-input text-primary focus:ring-ring">
                                     <div>
-                                        <span class="text-sm font-medium text-gray-900">{{ $role->name }}</span>
-                                        <code class="ml-2 text-xs text-indigo-500 font-mono bg-indigo-50 px-1 rounded">{{ $role->slug }}</code>
+                                        <span class="text-sm font-medium text-foreground">{{ $role->name }}</span>
+                                        <code class="ml-2 text-xs text-primary font-mono bg-primary/10 px-1 rounded">{{ $role->slug }}</code>
                                     </div>
                                 </label>
                             @endforeach
                         </div>
                     </div>
 
-                    <div class="pt-3 border-t border-gray-100 flex justify-between">
-                        <a href="{{ route('settings.users.index') }}"
-                            class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</a>
-                        <button type="submit"
-                            class="px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm">Update User</button>
+                    <div class="pt-4 border-t border-border flex justify-between">
+                        <a href="{{ route('settings.users.index') }}" class="btn-outline">Batal</a>
+                        <button type="submit" class="btn-default">Update User</button>
                     </div>
                 </form>
             </div>

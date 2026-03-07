@@ -95,15 +95,18 @@ class WhatsAppService
     /**
      * POST /client/sendMessage/:sessionId — kirim pesan teks
      *
+     * wwebjs-api expects: { chatId, contentType: "string", content: "..." }
+     *
      * @param  string $to      Nomor WA dalam format internasional: 6281234567890@c.us
      * @param  string $message Isi pesan
      */
     public function sendMessage(string $to, string $message, string $sessionId = 'beacon'): array
     {
         try {
-            $resp = $this->http()->post("{$this->baseUrl}/client/sendMessage/{$sessionId}", [
+            $resp = $this->http()->asJson()->post("{$this->baseUrl}/client/sendMessage/{$sessionId}", [
                 'chatId' => $to,
-                'message' => $message,
+                'contentType' => 'string',
+                'content' => $message,
             ]);
             return ['ok' => $resp->successful(), 'data' => $resp->json() ?? []];
         } catch (\Throwable $e) {

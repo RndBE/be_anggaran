@@ -1,3 +1,190 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 222.2 84% 4.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 222.2 84% 4.9%;
+        --primary: 238 84% 59%;
+        --primary-foreground: 210 40% 98%;
+        --secondary: 214 32% 91%;
+        --secondary-foreground: 222.2 47.4% 11.2%;
+        --muted: 210 40% 96.1%;
+        --muted-foreground: 215.4 16.3% 46.9%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --border: 214.3 31.8% 91.4%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 238 84% 59%;
+        --radius: 0.5rem;
+
+        /* status colors */
+        --success: 142 71% 45%;
+        --warning: 38 92% 50%;
+        --info: 199 89% 48%;
+    }
+
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings:
+            "rlig" 1,
+            "calt" 1;
+    }
+}
+
+@layer components {
+    /* ── Card ──────────────────────────────────────── */
+    .card {
+        @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
+    }
+    .card-header {
+        @apply flex flex-col space-y-1.5 p-6;
+    }
+    .card-title {
+        @apply text-lg font-semibold leading-none tracking-tight;
+    }
+    .card-description {
+        @apply text-sm text-muted-foreground;
+    }
+    .card-content {
+        @apply p-6 pt-0;
+    }
+    .card-footer {
+        @apply flex items-center p-6 pt-0;
+    }
+
+    /* ── Button ────────────────────────────────────── */
+    .btn {
+        @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 gap-2;
+    }
+    .btn-default {
+        @apply btn bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2;
+    }
+    .btn-secondary {
+        @apply btn bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 px-4 py-2;
+    }
+    .btn-destructive {
+        @apply btn bg-destructive text-destructive-foreground hover:bg-destructive/90 h-10 px-4 py-2;
+    }
+    .btn-outline {
+        @apply btn border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2;
+    }
+    .btn-ghost {
+        @apply btn hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2;
+    }
+    .btn-sm {
+        @apply h-9 rounded-md px-3 text-xs;
+    }
+    .btn-lg {
+        @apply h-11 rounded-md px-8;
+    }
+    .btn-icon {
+        @apply h-10 w-10;
+    }
+
+    /* ── Input ─────────────────────────────────────── */
+    .input {
+        @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .textarea {
+        @apply flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .select-input {
+        @apply flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    /* ── Label ─────────────────────────────────────── */
+    .label {
+        @apply text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+    }
+
+    /* ── Badge ─────────────────────────────────────── */
+    .badge {
+        @apply inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    }
+    .badge-default {
+        @apply badge border-transparent bg-primary text-primary-foreground;
+    }
+    .badge-secondary {
+        @apply badge border-transparent bg-secondary text-secondary-foreground;
+    }
+    .badge-destructive {
+        @apply badge border-transparent bg-destructive text-destructive-foreground;
+    }
+    .badge-outline {
+        @apply badge text-foreground;
+    }
+    .badge-success {
+        @apply badge border-transparent bg-green-100 text-green-700;
+    }
+    .badge-warning {
+        @apply badge border-transparent bg-amber-100 text-amber-700;
+    }
+    .badge-info {
+        @apply badge border-transparent bg-blue-100 text-blue-700;
+    }
+    .badge-purple {
+        @apply badge border-transparent bg-purple-100 text-purple-700;
+    }
+
+    /* ── Table ─────────────────────────────────────── */
+    .table-wrapper {
+        @apply w-full overflow-auto;
+    }
+    .table {
+        @apply w-full caption-bottom text-sm;
+    }
+    .table thead tr {
+        @apply border-b border-border;
+    }
+    .table th {
+        @apply h-12 px-4 text-left align-middle font-medium text-muted-foreground;
+    }
+    .table tbody tr {
+        @apply border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted;
+    }
+    .table td {
+        @apply p-4 align-middle;
+    }
+
+    /* ── Form group ────────────────────────────────── */
+    .form-group {
+        @apply space-y-2;
+    }
+
+    /* ── Separator ─────────────────────────────────── */
+    .separator {
+        @apply shrink-0 bg-border h-[1px] w-full;
+    }
+
+    /* ── Alert ─────────────────────────────────────── */
+    .alert {
+        @apply relative w-full rounded-lg border p-4;
+    }
+    .alert-success {
+        @apply alert border-green-200 bg-green-50 text-green-800;
+    }
+    .alert-destructive {
+        @apply alert border-destructive/50 text-destructive bg-destructive/5;
+    }
+    .alert-warning {
+        @apply alert border-amber-200 bg-amber-50 text-amber-800;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}

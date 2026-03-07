@@ -1,89 +1,117 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('My Requests') }}
-            </h2>
+            <div>
+                <h2 class="text-xl font-bold text-foreground">{{ __('My Requests') }}</h2>
+                <p class="text-sm text-muted-foreground mt-0.5">Daftar pengajuan anggaran dan reimbursement</p>
+            </div>
             @auth
                 @if(!Auth::user()->hasPermission('requests.view-all'))
-                    <a href="{{ route('requests.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm transition delay-50">
-                        + New Request
+                    <a href="{{ route('requests.create') }}" class="btn-default btn-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        New Request
                     </a>
                 @endif
             @endauth
         </div>
     </x-slot>
 
-    <div class="py-5">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
-                <div class="p-6 text-gray-900">
-                    
-                    @if(session('success'))
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                            <span class="block sm:inline">{{ session('success') }}</span>
-                        </div>
-                    @endif
+            @if(session('success'))
+                <div class="alert-success mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {{ session('success') }}
+                </div>
+            @endif
 
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+            <div class="card overflow-hidden">
+                <div class="table-wrapper">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($requests as $req)
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Amount</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @forelse($requests as $req)
-                                    <tr class="hover:bg-gray-50 transition delay-50">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $req->created_at->format('d M Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $req->title }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $req->type == 'budget' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800' }}">
-                                                {{ $req->type }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                                            Rp {{ number_format($req->total_amount, 0, ',', '.') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            @php
-                                                $statusColor = match($req->status) {
-                                                    'approved', 'paid' => 'bg-green-100 text-green-800',
-                                                    'rejected' => 'bg-red-100 text-red-800',
-                                                    'revision_requested' => 'bg-yellow-100 text-yellow-800',
-                                                    default => 'bg-gray-100 text-gray-800'
-                                                };
-                                            @endphp
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
-                                                {{ ucfirst(str_replace('_', ' ', $req->status)) }}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('requests.show', $req) }}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                                    <td class="text-sm text-muted-foreground whitespace-nowrap">
+                                        {{ $req->created_at->format('d M Y') }}
+                                    </td>
+                                    <td class="font-medium text-foreground">{{ $req->title }}</td>
+                                    <td>
+                                        <span class="{{ $req->type == 'budget' ? 'badge-info' : 'badge-purple' }}">
+                                            {{ ucfirst($req->type) }}
+                                        </span>
+                                    </td>
+                                    <td class="font-bold text-foreground whitespace-nowrap">
+                                        Rp {{ number_format($req->total_amount, 0, ',', '.') }}
+                                    </td>
+                                    <td>
+                                        @php
+                                            $badgeClass = match ($req->status) {
+                                                'approved', 'paid' => 'badge-success',
+                                                'rejected' => 'badge-destructive',
+                                                'revision_requested' => 'badge-purple',
+                                                'pending' => 'badge-warning',
+                                                default => 'badge-secondary',
+                                            };
+                                        @endphp
+                                        <span class="{{ $badgeClass }}">
+                                            {{ ucfirst(str_replace('_', ' ', $req->status)) }}
+                                        </span>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <a href="{{ route('requests.show', $req) }}" class="btn-outline btn-sm">View</a>
                                             @if($req->status === 'draft' || $req->status === 'revision_requested')
-                                                <a href="{{ route('requests.edit', $req) }}" class="text-yellow-600 hover:text-yellow-900 ml-3">Edit</a>
+                                                <a href="{{ route('requests.edit', $req) }}"
+                                                    class="btn-secondary btn-sm">Edit</a>
                                             @endif
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                                            No requests found. Create a new one!
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+                                            @php
+                                                $deletableStatuses = ['draft', 'submitted', 'revision_requested'];
+                                                $canDelete = Auth::user()->hasPermission('requests.delete')
+                                                    || ($req->user_id === Auth::id() && in_array($req->status, $deletableStatuses));
+                                            @endphp
+                                            @if($canDelete)
+                                                <form method="POST" action="{{ route('requests.destroy', $req) }}"
+                                                    class="inline" onsubmit="return confirm('Yakin ingin menghapus request \" {{ addslashes($req->title) }}\"?')">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn-destructive btn-sm">Hapus</button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="py-12 text-center">
+                                        <svg class="w-10 h-10 mx-auto mb-3 text-muted" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <p class="text-sm text-muted-foreground">No requests found.
+                                            <a href="{{ route('requests.create') }}"
+                                                class="text-primary hover:underline">Create one now →</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

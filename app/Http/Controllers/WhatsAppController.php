@@ -30,7 +30,12 @@ class WhatsAppController extends Controller
     {
         $session = config('whatsapp.session', 'beacon');
         $result = $this->wa->getStatus($session);
-        return response()->json($result['data'] ?? ['status' => 'UNKNOWN']);
+        $data = $result['data'] ?? [];
+
+        // wwebjs-api bisa mengembalikan 'state' atau 'status' — normalize ke 'status'
+        $status = $data['status'] ?? $data['state'] ?? 'UNKNOWN';
+
+        return response()->json(array_merge($data, ['status' => $status]));
     }
 
     /** Start / inisialisasi session */
@@ -60,11 +65,23 @@ class WhatsAppController extends Controller
         ]);
 
         $session = config('whatsapp.session', 'beacon');
-        // Format: 6281234567890@c.us
-        $to = preg_replace('/\D/', '', $request->phone) . '@c.us';
+
+        // Strip semua non-digit
+        $phone = preg_replace('/\D/', '', $request->phone);
+
+        // Normalisasi ke format internasional Indonesia
+        // 08xx... → 628xx...
+        // 628xx   → 628xx (sudah benar)
+        if (str_starts_with($phone, '0')) {
+            $phone = '62' . substr($phone, 1);
+        }
+
+        $to = $phone . '@c.us';
+
+        \Illuminate\Support\Facades\Log::info("WA testSend: to={$to}");
 
         $result = $this->wa->sendMessage($to, $request->message, $session);
 
-        return response()->json($result);
+        return response()->json(array_merge($result, ['_to' => $to]));
     }
 }

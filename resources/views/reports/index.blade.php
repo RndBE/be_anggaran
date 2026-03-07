@@ -1,77 +1,125 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Reports & Audit Logs') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-xl font-bold text-foreground">{{ __('Reports & Audit Logs') }}</h2>
+                <p class="text-sm text-muted-foreground mt-0.5">Overview semua pengajuan dalam sistem</p>
+            </div>
+            <a href="{{ route('reports.export') }}" class="btn-secondary btn-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                </svg>
+                Export CSV
+            </a>
+        </div>
     </x-slot>
 
-    <div class="py-5">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
-                <div class="px-6 py-4 justify-between flex items-center border-b">
-                    <h3 class="text-lg font-bold">All Requests Overview</h3>
-                    <a href="{{ route('reports.export') }}"
-                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm inline-flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
-                        Export CSV
-                    </a>
+            <div class="card overflow-hidden">
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="card-title">All Requests Overview</h3>
                 </div>
-                <div class="p-6 text-gray-900">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                <div class="table-wrapper">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Requestor</th>
+                                <th>Client Code</th>
+                                <th>Type</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($requests as $req)
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                        Requestor</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client
-                                        Code</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"></th>
+                                    <td class="font-mono text-xs text-muted-foreground">REQ-{{ str_pad($req->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="font-medium text-foreground">{{ $req->user->name }}</td>
+                                    <td class="text-sm text-muted-foreground">
+                                        {{ $req->clientCode ? $req->clientCode->prefix . '-' . $req->clientCode->instansi_singkat : '-' }}
+                                    </td>
+                                    <td class="capitalize text-sm text-muted-foreground">{{ $req->type }}</td>
+                                    <td class="font-bold text-foreground whitespace-nowrap">Rp {{ number_format($req->total_amount, 0, ',', '.') }}</td>
+                                    <td>
+                                        @php
+                                            $badgeClass = match($req->status) {
+                                                'approved', 'paid' => 'badge-success',
+                                                'rejected'         => 'badge-destructive',
+                                                'revision_requested' => 'badge-purple',
+                                                'pending'          => 'badge-warning',
+                                                default            => 'badge-secondary',
+                                            };
+                                        @endphp
+                                        <span class="{{ $badgeClass }}">{{ ucfirst(str_replace('_', ' ', $req->status)) }}</span>
+                                    </td>
+                                    <td class="whitespace-nowrap">
+                                        <div class="flex items-center gap-2">
+                                            <a href="{{ route('reports.show', $req) }}" class="btn-outline btn-sm">Detail</a>
+                                            @if(Auth::user()->hasPermission('requests.delete'))
+                                                <form id="delete-form-{{ $req->id }}" method="POST" action="{{ route('requests.destroy', $req) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button"
+                                                        onclick="openDeleteModal({{ $req->id }}, '{{ addslashes($req->title) }}')"
+                                                        class="btn-destructive btn-sm">
+                                                        Hapus
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($requests as $req)
-                                    <tr class="hover:bg-gray-50 transition-colors">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            REQ-{{ str_pad($req->id, 4, '0', STR_PAD_LEFT) }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $req->user->name }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $req->clientCode ? $req->clientCode->prefix . '-' . $req->clientCode->instansi_singkat : '-' }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
-                                            {{ $req->type }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Rp
-                                            {{ number_format($req->total_amount, 0, ',', '.') }}
-                                        </td>
-                                        <td
-                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 uppercase font-mono text-xs">
-                                            {{ $req->status }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                            <a href="{{ route('reports.show', $req) }}"
-                                                class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">
-                                                Detail →
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- Delete Modal --}}
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeDeleteModal()"></div>
+        <div class="relative card w-full max-w-md mx-4 p-6 animate-fade-in">
+            <div class="flex items-start gap-4">
+                <div class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-destructive/10">
+                    <svg class="w-5 h-5 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="card-title">Hapus Pengajuan</h3>
+                    <p class="text-sm text-muted-foreground mt-1">
+                        Apakah Anda yakin ingin menghapus <span id="deleteModalTitle" class="font-semibold text-foreground"></span>? Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                </div>
+            </div>
+            <div class="mt-5 flex justify-end gap-3">
+                <button onclick="closeDeleteModal()" class="btn-outline">Batal</button>
+                <button id="confirmDeleteBtn" onclick="submitDelete()" class="btn-destructive">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pendingDeleteId = null;
+        function openDeleteModal(id, title) {
+            pendingDeleteId = id;
+            document.getElementById('deleteModalTitle').textContent = '"' + title + '"';
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+        function closeDeleteModal() {
+            pendingDeleteId = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+        function submitDelete() {
+            if (pendingDeleteId) document.getElementById('delete-form-' + pendingDeleteId).submit();
+        }
+    </script>
 </x-app-layout>

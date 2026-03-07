@@ -1,80 +1,70 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Settings: Policies & Zones') }}
-        </h2>
+        <div>
+            <h2 class="text-xl font-bold text-foreground">Policies & Zones</h2>
+            <p class="text-sm text-muted-foreground mt-0.5">Ringkasan kebijakan limit dan zona perjalanan dinas</p>
+        </div>
     </x-slot>
 
-    <div class="py-5">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-3">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-5">
 
-            <!-- Policies Settings -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
-                <div class="px-6 py-4 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4">Reimbursement Limit Policies</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+            {{-- Reimbursement Limit Policies --}}
+            <div class="card overflow-hidden">
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="card-title">Reimbursement Limit Policies</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>Policy Name</th>
+                                <th>Key Identifier</th>
+                                <th class="text-right">Current Value (Limit)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($policies as $policy)
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Policy
-                                        Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Key
-                                        Identifier</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current
-                                        Value (Limit)</th>
+                                    <td class="font-medium text-foreground">{{ $policy->name }}</td>
+                                    <td><code class="text-xs font-mono text-muted-foreground">{{ $policy->key }}</code></td>
+                                    <td class="text-right font-bold text-primary">Rp
+                                        {{ number_format($policy->value, 0, ',', '.') }}</td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($policies as $policy)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                            {{ $policy->name }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                                            {{ $policy->key }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">Rp
-                                            {{ number_format($policy->value, 0, ',', '.') }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Travel Zones Settings -->
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg border border-gray-100">
-                <div class="px-6 py-4 text-gray-900">
-                    <h3 class="text-lg font-bold mb-4">Travel Zones & Meal Allowances (Lumpsum)</h3>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+            {{-- Travel Zones --}}
+            <div class="card overflow-hidden">
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="card-title">Travel Zones & Meal Allowances</h3>
+                </div>
+                <div class="table-wrapper">
+                    <table class="table w-full">
+                        <thead>
+                            <tr>
+                                <th>Zone Level</th>
+                                <th>Region Name</th>
+                                <th class="text-right">Lumpsum Allowance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($zones as $zone)
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Zone
-                                        Level</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Region
-                                        Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lumpsum
-                                        Allowance</th>
+                                    <td>
+                                        <span
+                                            class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-xs">{{ $zone->zone }}</span>
+                                    </td>
+                                    <td class="font-medium text-foreground">{{ $zone->name }}</td>
+                                    <td class="text-right font-bold text-primary">Rp
+                                        {{ number_format($zone->meal_allowance, 0, ',', '.') }} / Hari</td>
                                 </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($zones as $zone)
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Zone
-                                            {{ $zone->zone }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $zone->name }}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-bold">Rp
-                                            {{ number_format($zone->meal_allowance, 0, ',', '.') }} / Day
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
 

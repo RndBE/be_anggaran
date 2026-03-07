@@ -15,12 +15,13 @@
     </x-slot>
 
     <div class="py-6" x-data="waPanel()" x-init="init()">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
             {{-- Flash messages --}}
             @if(session('success'))
                 <div class="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
-                    {{ session('success') }}</div>
+                    {{ session('success') }}
+                </div>
             @endif
 
             {{-- ── Status Card ─────────────────────────────────────────── --}}
@@ -72,7 +73,7 @@
                         </p>
                         <div class="inline-block p-4 bg-white border-2 border-amber-300 rounded-2xl shadow-md">
                             <img :src="qrImageUrl + '&t=' + Date.now()" alt="QR Code WhatsApp"
-                                class="w-56 h-56 object-contain" @error="qrError = true">
+                                class="w-56 h-56 object-contain" x-on:error="qrError = true">
                         </div>
                         <p class="text-xs text-gray-400 mt-3">QR code akan refresh otomatis setiap 15 detik</p>
                     </div>
@@ -209,8 +210,15 @@
                 _lastPoll: null,
 
                 init() {
+                    console.group('%c[WA Gateway] Init', 'color:#22c55e;font-weight:bold');
+                    console.log('Base URL  :', @json(config('whatsapp.base_url')));
+                    console.log('Session   :', @json(config('whatsapp.session', 'beacon')));
+                    console.log('Status URL:', '{{ route("settings.whatsapp.status") }}');
+                    console.log('QR URL    :', this.qrImageUrl);
+                    console.log('Initial status:', this.status);
+                    console.groupEnd();
                     this.updateTimeAgo();
-                    this.poll();  // langsung poll saat halaman selesai load
+                    this.poll();
                     this._pollTimer = setInterval(() => this.poll(), 10000);
                     setInterval(() => this.updateTimeAgo(), 5000);
                 },
@@ -227,19 +235,47 @@
                 },
 
                 async poll() {
+                    const url = '{{ route("settings.whatsapp.status") }}';
+                    console.group('%c[WA Gateway] poll()', 'color:#6366f1');
+                    console.log('→ GET', url);
                     try {
-                        const res = await fetch('{{ route("settings.whatsapp.status") }}', {
+                        const res = await fetch(url, {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' }
                         });
-                        const data = await res.json();
-                        this.status = data.status ?? 'UNKNOWN';
+                        console.log('HTTP status:', res.status, res.statusText);
+
+                        const raw = await res.text();
+                        console.log('Raw response:', raw);
+
+                        let data;
+                        try {
+                            data = JSON.parse(raw);
+                        } catch (parseErr) {
+                            console.error('JSON parse error:', parseErr);
+                            console.error('Could not parse response body (see "Raw response" above)');
+                            this.status = 'UNREACHABLE';
+                            console.groupEnd();
+                            return;
+                        }
+
+                        console.log('Parsed data:', data);
+                        const prevStatus = this.status;
+                        // wwebjs-api may return 'state' OR 'status' — check both
+                        this.status = data.status ?? data.state ?? 'UNKNOWN';
+                        console.log('→ status field:', data.status !== undefined ? 'data.status' : (data.state !== undefined ? 'data.state' : 'fallback UNKNOWN'), '=', this.status);
                         this.statusData = data;
-                        this.phoneInfo = data.phone ?? '';
+                        this.phoneInfo = data.phone ?? data.phoneNumber ?? '';
                         this._lastPoll = new Date();
                         this.timeAgo = 'just now';
+
+                        if (prevStatus !== this.status) {
+                            console.warn(`Status changed: ${prevStatus} → ${this.status}`);
+                        }
                     } catch (e) {
+                        console.error('Fetch error:', e);
                         this.status = 'UNREACHABLE';
                     }
+                    console.groupEnd();
                 },
 
                 updateTimeAgo() {
@@ -249,72 +285,95 @@
                 },
 
                 async startSession() {
+                    const url = '{{ route("settings.whatsapp.start") }}';
+                    console.group('%c[WA Gateway] startSession()', 'color:#f59e0b;font-weight:bold');
+                    console.log('→ POST', url);
                     this.loading = true;
                     this.actionMsg = 'Memulai session…';
                     try {
-                        await fetch('{{ route("settings.whatsapp.start") }}', {
+                        const res = await fetch(url, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'X-Requested-With': 'XMLHttpRequest',
                             }
                         });
+                        const raw = await res.text();
+                        console.log('HTTP status:', res.status, res.statusText);
+                        console.log('Response:', raw);
                         this.actionMsg = 'Session dimulai. Menunggu QR…';
                         setTimeout(() => this.poll(), 2000);
                     } catch (e) {
+                        console.error('startSession error:', e);
                         this.actionMsg = 'Gagal memulai session.';
                     } finally {
                         this.loading = false;
                     }
+                    console.groupEnd();
                 },
 
                 async terminateSession() {
                     if (!confirm('Yakin ingin memutus koneksi WhatsApp?')) return;
+                    const url = '{{ route("settings.whatsapp.terminate") }}';
+                    console.group('%c[WA Gateway] terminateSession()', 'color:#ef4444;font-weight:bold');
+                    console.log('→ DELETE', url);
                     this.loading = true;
                     this.actionMsg = 'Memutus koneksi…';
                     try {
-                        await fetch('{{ route("settings.whatsapp.terminate") }}', {
+                        const res = await fetch(url, {
                             method: 'POST',
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'X-Requested-With': 'XMLHttpRequest',
                             }
                         });
+                        const raw = await res.text();
+                        console.log('HTTP status:', res.status, res.statusText);
+                        console.log('Response:', raw);
                         this.actionMsg = 'Session diputus.';
                         setTimeout(() => this.poll(), 1000);
                     } catch (e) {
+                        console.error('terminateSession error:', e);
                         this.actionMsg = 'Gagal memutus session.';
                     } finally {
                         this.loading = false;
                     }
+                    console.groupEnd();
                 },
 
                 async sendTest() {
                     if (!this.testPhone || !this.testMessage) return;
+                    const url = '{{ route("settings.whatsapp.test-send") }}';
+                    const payload = { phone: this.testPhone, message: this.testMessage };
+                    console.group('%c[WA Gateway] sendTest()', 'color:#0ea5e9;font-weight:bold');
+                    console.log('→ POST', url);
+                    console.log('Payload:', payload);
                     this.loading = true;
                     this.testResult = '';
                     try {
-                        const res = await fetch('{{ route("settings.whatsapp.test-send") }}', {
+                        const res = await fetch(url, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
                                 'X-Requested-With': 'XMLHttpRequest',
                             },
-                            body: JSON.stringify({
-                                phone: this.testPhone,
-                                message: this.testMessage,
-                            })
+                            body: JSON.stringify(payload)
                         });
-                        const data = await res.json();
+                        const raw = await res.text();
+                        console.log('HTTP status:', res.status, res.statusText);
+                        console.log('Response:', raw);
+                        const data = JSON.parse(raw);
                         this.testOk = data.ok ?? false;
                         this.testResult = data.ok ? '✅ Pesan terkirim!' : '❌ Gagal: ' + (data.error ?? 'Unknown error');
                     } catch (e) {
+                        console.error('sendTest error:', e);
                         this.testOk = false;
                         this.testResult = '❌ ' + e.message;
                     } finally {
                         this.loading = false;
                     }
+                    console.groupEnd();
                 }
             };
         }

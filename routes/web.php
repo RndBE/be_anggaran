@@ -10,8 +10,12 @@ use App\Http\Controllers\UserManagementController;
 use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\PolicyController;
 use App\Http\Controllers\TravelZoneController;
+use App\Http\Controllers\ClientCodeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\WhatsAppController;
+use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\TravelReportController;
+use App\Http\Controllers\TravelReportApprovalController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +33,15 @@ Route::middleware('auth')->group(function () {
     Route::resource('requests', RequestController::class);
     Route::resource('approvals', ApprovalController::class)->only(['index', 'show', 'update']);
 
+    // Travel Reports (LHP)
+    Route::get('/travel-reports/{travelReport}/print', [TravelReportController::class, 'print'])->name('travel-reports.print');
+    Route::resource('travel-reports', TravelReportController::class)->except(['edit', 'update']);
+
+    // LHP Approvals
+    Route::get('/travel-report-approvals', [TravelReportApprovalController::class, 'index'])->name('travel-report-approvals.index');
+    Route::get('/travel-report-approvals/{travelReportApproval}', [TravelReportApprovalController::class, 'show'])->name('travel-report-approvals.show');
+    Route::patch('/travel-report-approvals/{travelReportApproval}', [TravelReportApprovalController::class, 'update'])->name('travel-report-approvals.update');
+
     // Admin & Extra
     Route::middleware(['permission:settings.manage'])->group(function () {
         Route::get('/settings/policies', [SettingsController::class, 'policies'])->name('settings.policies');
@@ -44,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('settings/divisions', DivisionController::class)->names('settings.divisions');
         Route::resource('settings/policies', PolicyController::class)->names('settings.policies');
         Route::resource('settings/travel-zones', TravelZoneController::class)->names('settings.travel-zones');
+        Route::resource('settings/client-codes', ClientCodeController::class)->names('settings.client-codes');
 
         // WhatsApp Gateway
         Route::get('/settings/whatsapp', [WhatsAppController::class, 'index'])->name('settings.whatsapp');
@@ -51,10 +65,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/whatsapp/start', [WhatsAppController::class, 'start'])->name('settings.whatsapp.start');
         Route::post('/settings/whatsapp/terminate', [WhatsAppController::class, 'terminate'])->name('settings.whatsapp.terminate');
         Route::post('/settings/whatsapp/test-send', [WhatsAppController::class, 'testSend'])->name('settings.whatsapp.test-send');
+
+        // Audit Log
+        Route::get('/settings/audit-logs', [AuditLogController::class, 'index'])->name('settings.audit-logs.index');
     });
+
 
     Route::middleware(['permission:reports.view'])->group(function () {
         Route::get('/reports/export', [ReportController::class, 'exportCsv'])->name('reports.export');
+        Route::get('/reports/lhp-perjalanan-dinas', function () {
+            return view('reports.lhp-perjalanan-dinas');
+        })->name('reports.lhp-perjalanan-dinas');
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
         Route::get('/reports/{report}', [ReportController::class, 'show'])->name('reports.show');
     });

@@ -9,6 +9,7 @@ use App\Models\Request as BudgetRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\AuditLogService;
 
 class ApprovalController extends Controller
 {
@@ -139,6 +140,11 @@ class ApprovalController extends Controller
             }
 
             DB::commit();
+            $action = 'approval.' . $request->status; // approval.approved / approval.rejected / approval.revision
+            AuditLogService::log($action, $approval->request, [
+                'approval_id' => $approval->id,
+                'comments' => $request->comments,
+            ]);
             return redirect()->route('approvals.index')->with('success', 'Approval status updated.');
         } catch (\Exception $e) {
             DB::rollBack();

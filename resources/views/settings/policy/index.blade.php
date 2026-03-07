@@ -13,15 +13,17 @@
     </x-slot>
 
     <div class="py-5">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-4">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-4">
 
             @if(session('success'))
                 <div class="p-4 bg-green-100 border border-green-200 text-green-700 rounded-lg text-sm">
-                    {{ session('success') }}</div>
+                    {{ session('success') }}
+                </div>
             @endif
             @if($errors->has('error'))
                 <div class="p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm">
-                    {{ $errors->first('error') }}</div>
+                    {{ $errors->first('error') }}
+                </div>
             @endif
 
             <div class="bg-white shadow sm:rounded-lg border border-gray-100 overflow-hidden">

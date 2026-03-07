@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\TravelZone;
 use Illuminate\Http\Request;
+use App\Services\AuditLogService;
 
 class TravelZoneController extends Controller
 {
     public function index()
     {
         $zones = TravelZone::orderBy('zone')->get();
-        return view('settings.travel_zones.index', compact('zones'));
+        $nextZone = TravelZone::max('zone') + 1;
+        return view('settings.travel_zones.index', compact('zones', 'nextZone'));
     }
 
     public function create()
@@ -27,7 +29,8 @@ class TravelZoneController extends Controller
             'meal_allowance' => 'required|numeric|min:0',
         ]);
 
-        TravelZone::create($request->only('zone', 'name', 'meal_allowance'));
+        $zone = TravelZone::create($request->only('zone', 'name', 'meal_allowance'));
+        AuditLogService::log('travel_zone.created', $zone, $request->only('zone', 'name', 'meal_allowance'));
 
         return redirect()->route('settings.travel-zones.index')
             ->with('success', "Zone {$request->zone} berhasil dibuat.");
@@ -40,13 +43,18 @@ class TravelZoneController extends Controller
 
     public function update(Request $request, TravelZone $travelZone)
     {
-        $request->validate([
+        $validated = $request->validate([
             'zone' => 'required|integer|min:1|unique:travel_zones,zone,' . $travelZone->id,
             'name' => 'required|string|max:100',
             'meal_allowance' => 'required|numeric|min:0',
         ]);
 
-        $travelZone->update($request->only('zone', 'name', 'meal_allowance'));
+        // Flash edit id so the modal re-opens on validation failure
+        $request->merge(['_edit_id' => $travelZone->id]);
+        $request->flash();
+
+        AuditLogService::logChanges('travel_zone.updated', $travelZone, $travelZone->getOriginal(), $validated);
+        $travelZone->update($validated);
 
         return redirect()->route('settings.travel-zones.index')
             ->with('success', "Zone {$travelZone->zone} berhasil diperbarui.");
@@ -55,6 +63,7 @@ class TravelZoneController extends Controller
     public function destroy(TravelZone $travelZone)
     {
         $zone = $travelZone->zone;
+        AuditLogService::log('travel_zone.deleted', $travelZone, ['zone' => $zone]);
         $travelZone->delete();
 
         return redirect()->route('settings.travel-zones.index')

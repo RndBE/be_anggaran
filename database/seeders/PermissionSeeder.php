@@ -36,6 +36,12 @@ class PermissionSeeder extends Seeder
                 'description' => 'Melihat semua pengajuan, tidak hanya milik sendiri',
                 'roles' => ['admin', 'auditor'],
             ],
+            [
+                'name' => 'Hapus Pengajuan',
+                'slug' => 'requests.delete',
+                'description' => 'Menghapus pengajuan milik siapa saja, terlepas dari statusnya',
+                'roles' => ['admin'],
+            ],
         ];
 
         foreach ($permissions as $data) {

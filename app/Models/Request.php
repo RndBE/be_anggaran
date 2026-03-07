@@ -8,6 +8,10 @@ class Request extends Model
 {
     protected $guarded = [];
 
+    protected $casts = [
+        'surat_tugas_date' => 'date',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -41,5 +45,10 @@ class Request extends Model
     public function participants()
     {
         return $this->belongsToMany(User::class, 'request_participants')->withTimestamps();
+    }
+
+    public function travelReport()
+    {
+        return $this->hasOne(TravelReport::class);
     }
 }
