@@ -76,8 +76,16 @@
                                 </div>
                                 <div>
                                     <label class="label text-xs">Tanggal Surat Tugas</label>
-                                    <input type="date" name="surat_tugas_date" x-model="tanggal" @input="generate()"
-                                        class="input w-full" value="{{ old('surat_tugas_date') }}">
+                                    <div class="date-input-wrapper">
+                                        <input type="text" name="surat_tugas_date" id="surat_tugas_date_fp"
+                                            class="flatpickr-input w-full" value="{{ old('surat_tugas_date') }}"
+                                            placeholder="Pilih tanggal…" readonly>
+                                        <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
                                 </div>
                             </div>
                             <div x-show="preview"
@@ -333,6 +341,25 @@
                 create: false,
                 sortField: { field: 'text', direction: 'asc' },
             });
+
+            // Flatpickr for surat tugas date with Alpine.js x-model sync
+            const fpEl = document.getElementById('surat_tugas_date_fp');
+            if (fpEl) {
+                flatpickr(fpEl, {
+                    locale: 'id',
+                    dateFormat: 'Y-m-d',
+                    allowInput: true,
+                    disableMobile: true,
+                    defaultDate: fpEl.value || null,
+                    onChange: function (selectedDates, dateStr) {
+                        // Sync to Alpine x-model (suratTugasPreview)
+                        fpEl._x_model && fpEl._x_model.set(dateStr);
+                        // Trigger Alpine's generate() via dispatching input event
+                        fpEl.value = dateStr;
+                        fpEl.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                });
+            }
         });
     </script>
 </x-app-layout>

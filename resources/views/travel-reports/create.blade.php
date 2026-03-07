@@ -71,19 +71,34 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-1.5">Tanggal Keberangkatan <span class="text-destructive">*</span></label>
-                            <input type="date" name="departure_date" class="input w-full"
-                                value="{{ old('departure_date') }}" required>
+                            <div class="date-input-wrapper">
+                                <input type="text" name="departure_date" data-datepicker
+                                    class="flatpickr-input w-full"
+                                    value="{{ old('departure_date') }}"
+                                    placeholder="Pilih tanggal…" required readonly>
+                                <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-1.5">Tanggal Kepulangan <span class="text-destructive">*</span></label>
-                            <input type="date" name="return_date" class="input w-full"
-                                value="{{ old('return_date') }}" required>
+                            <div class="date-input-wrapper">
+                                <input type="text" name="return_date" data-datepicker
+                                    class="flatpickr-input w-full"
+                                    value="{{ old('return_date') }}"
+                                    placeholder="Pilih tanggal…" required readonly>
+                                <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-1.5">Tanggal Surat Tugas</label>
-                            <input type="date" name="surat_tugas_date" class="input w-full {{ $selectedRequest && $selectedRequest->surat_tugas_date ? 'bg-muted' : '' }}"
-                                value="{{ old('surat_tugas_date', $selectedRequest->surat_tugas_date ?? '') }}"
-                                {{ $selectedRequest && $selectedRequest->surat_tugas_date ? 'readonly' : '' }}>
+                            <div class="date-input-wrapper">
+                                <input type="text" name="surat_tugas_date" data-datepicker
+                                    class="flatpickr-input w-full {{ $selectedRequest && $selectedRequest->surat_tugas_date ? 'bg-muted' : '' }}"
+                                    value="{{ old('surat_tugas_date', $selectedRequest->surat_tugas_date ?? '') }}"
+                                    placeholder="Pilih tanggal…"
+                                    {{ $selectedRequest && $selectedRequest->surat_tugas_date ? 'readonly' : '' }}>
+                                <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
                             @if($selectedRequest && $selectedRequest->surat_tugas_date)
                                 <p class="text-xs text-primary mt-1">✓ Otomatis dari request</p>
                             @endif
@@ -118,7 +133,11 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Tanggal <span class="text-destructive">*</span></label>
-                                    <input type="date" name="activities[0][date]" class="input w-full" required>
+                                    <div class="date-input-wrapper">
+                                        <input type="text" name="activities[0][date]" data-datepicker
+                                            class="flatpickr-input w-full" placeholder="Pilih tanggal…" required readonly>
+                                        <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </div>
                                 </div>
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Pelaksanaan Kegiatan <span class="text-destructive">*</span></label>
@@ -252,7 +271,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Tanggal <span class="text-destructive">*</span></label>
-                            <input type="date" name="activities[${idx}][date]" class="input w-full" required>
+                            <div class="date-input-wrapper">
+                                <input type="text" name="activities[${idx}][date]" data-datepicker
+                                    class="flatpickr-input w-full" placeholder="Pilih tanggal…" required readonly>
+                                <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            </div>
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1.5">Pelaksanaan Kegiatan <span class="text-destructive">*</span></label>
@@ -301,6 +324,8 @@
             container.appendChild(block);
             activityIndex++;
             updateActivityNumbers();
+            // Init Flatpickr on the new block's date input
+            initFlatpickr(block);
         }
 
         function removeActivityBlock(btn) {

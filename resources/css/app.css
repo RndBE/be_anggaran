@@ -188,3 +188,139 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* ── Flatpickr – Shadcn Theme ───────────────────────────── */
+.flatpickr-input {
+    @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+.flatpickr-input.bg-muted {
+    background-color: hsl(var(--muted));
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.flatpickr-calendar {
+    @apply bg-card border border-border rounded-xl shadow-lg p-3 font-sans text-foreground;
+    width: 280px !important;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+.flatpickr-calendar.arrowBottom:before,
+.flatpickr-calendar.arrowBottom:after,
+.flatpickr-calendar.arrowTop:before,
+.flatpickr-calendar.arrowTop:after {
+    border-color: transparent !important;
+    display: none;
+}
+
+/* Header / navigation */
+.flatpickr-months {
+    @apply flex items-center pb-2 mb-1;
+    position: relative !important;
+    height: 34px !important;
+}
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    position: static !important;
+    @apply flex items-center justify-center w-7 h-7 rounded-md hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer shrink-0;
+    padding: 0 !important;
+    height: 28px !important;
+}
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+    @apply w-4 h-4;
+    fill: currentColor !important;
+}
+.flatpickr-month {
+    @apply flex-1;
+    height: auto !important;
+    overflow: visible !important;
+}
+.flatpickr-current-month {
+    @apply flex items-center justify-center gap-1 text-sm font-semibold text-foreground;
+    padding: 0 !important;
+    height: 100% !important;
+    position: relative !important;
+    left: auto !important;
+    width: 100% !important;
+    text-align: center !important;
+}
+.flatpickr-current-month input.cur-year,
+.flatpickr-current-month .numInputWrapper {
+    @apply text-sm font-semibold text-foreground;
+    width: 5ch !important;
+}
+.flatpickr-current-month select.flatpickr-monthDropdown-months {
+    @apply text-sm font-semibold text-foreground bg-transparent border-0 cursor-pointer outline-none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.numInputWrapper span {
+    @apply hidden;
+}
+
+/* Weekday headers */
+.flatpickr-weekdays {
+    @apply pb-1;
+}
+.flatpickr-weekday {
+    @apply text-xs font-medium text-muted-foreground;
+}
+
+/* Days grid */
+.flatpickr-days {
+    width: 100% !important;
+}
+.dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+.flatpickr-day {
+    @apply text-sm text-foreground rounded-md transition-colors;
+    height: 36px !important;
+    line-height: 36px !important;
+    max-width: 36px !important;
+    flex-basis: 14.28% !important;
+}
+.flatpickr-day:hover:not(.selected):not(.today) {
+    @apply bg-accent text-accent-foreground border-0;
+}
+.flatpickr-day.today {
+    @apply font-semibold text-primary;
+    border-color: hsl(var(--primary)) !important;
+    background: transparent !important;
+}
+.flatpickr-day.today:hover {
+    @apply bg-primary/10;
+}
+.flatpickr-day.selected,
+.flatpickr-day.selected:hover {
+    background: hsl(var(--primary)) !important;
+    @apply text-primary-foreground border-0 font-medium;
+}
+.flatpickr-day.inRange {
+    background: hsl(var(--primary) / 0.15) !important;
+    @apply border-0 text-foreground;
+    box-shadow: none !important;
+}
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: hsl(var(--primary)) !important;
+    @apply text-primary-foreground border-0;
+}
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.prevMonthDay,
+.flatpickr-day.nextMonthDay {
+    @apply text-muted-foreground opacity-40;
+}
+
+/* Date input wrapper – adds calendar icon on the right */
+.date-input-wrapper {
+    @apply relative;
+}
+.date-input-wrapper .flatpickr-input {
+    @apply pr-10;
+}
+.date-input-wrapper .date-icon {
+    @apply absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none;
+}

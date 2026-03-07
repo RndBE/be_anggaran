@@ -13,6 +13,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -36,6 +41,31 @@
         </main>
     </div>
     @stack('scripts')
+
+    {{-- Global Flatpickr Init --}}
+    <script>
+        function initFlatpickr(root) {
+            var targets = (root || document).querySelectorAll('[data-datepicker]');
+            targets.forEach(function (el) {
+                if (el._flatpickr) return; // already initialized
+                var opts = {
+                    locale: 'id',
+                    dateFormat: 'Y-m-d',
+                    allowInput: true,
+                    disableMobile: true,
+                };
+                // range mode when both data-datepicker-range-start / end present
+                if (el.dataset.datepickerMode === 'range') {
+                    opts.mode = 'range';
+                }
+                flatpickr(el, opts);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            initFlatpickr();
+        });
+    </script>
 </body>
 
 </html>

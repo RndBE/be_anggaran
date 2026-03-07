@@ -23,7 +23,8 @@
                             <option value="">Semua User</option>
                             @foreach($users as $u)
                                 <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>
-                                    {{ $u->name }}</option>
+                                    {{ $u->name }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
@@ -32,14 +33,28 @@
                             <option value="">Semua Action</option>
                             @foreach($actionGroups as $prefix => $label)
                                 <option value="{{ $prefix }}" {{ request('action') === $prefix ? 'selected' : '' }}>
-                                    {{ $label }}</option>
+                                    {{ $label }}
+                                </option>
                             @endforeach
                         </select>
                     </div>
                     <div class="flex gap-2">
-                        <input type="date" name="date_from" value="{{ request('date_from') }}"
-                            class="input w-full text-sm">
-                        <input type="date" name="date_to" value="{{ request('date_to') }}" class="input w-full text-sm">
+                        <div class="date-input-wrapper flex-1">
+                            <input type="text" name="date_from" data-datepicker value="{{ request('date_from') }}"
+                                class="flatpickr-input w-full text-sm" placeholder="Dari tanggal" readonly>
+                            <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="date-input-wrapper flex-1">
+                            <input type="text" name="date_to" data-datepicker value="{{ request('date_to') }}"
+                                class="flatpickr-input w-full text-sm" placeholder="Sampai tanggal" readonly>
+                            <svg class="date-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-3 flex items-center gap-2">
@@ -80,7 +95,8 @@
                                 @endphp
                                 <tr class="align-top">
                                     <td class="text-xs text-muted-foreground whitespace-nowrap">
-                                        {{ $log->created_at->format('d/m/y H:i:s') }}</td>
+                                        {{ $log->created_at->format('d/m/y H:i:s') }}
+                                    </td>
                                     <td>
                                         @if($log->user)
                                             <span class="font-medium text-foreground text-sm">{{ $log->user->name }}</span>
@@ -102,7 +118,8 @@
                                         @if($log->changes)
                                             <details>
                                                 <summary class="cursor-pointer text-primary hover:underline font-medium">
-                                                    {{ count($log->changes) }} perubahan</summary>
+                                                    {{ count($log->changes) }} perubahan
+                                                </summary>
                                                 <div class="mt-1 space-y-0.5 pl-2">
                                                     @foreach($log->changes as $field => $val)
                                                         <div class="font-mono text-xs">
