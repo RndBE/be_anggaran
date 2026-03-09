@@ -28,7 +28,7 @@ class TravelReportApprovalController extends Controller
 
         // Load all pending LHP approvals, then filter by canApprove
         $pending = TravelReportApproval::where('status', 'pending')
-            ->with(['travelReport.user.division', 'travelReport.user.roles'])
+            ->with(['travelReport.user.division', 'travelReport.user.roles', 'approvalStep.role'])
             ->get()
             ->filter(fn($approval) => $this->workflow->canApprove($user, $approval))
             ->values();
@@ -60,6 +60,8 @@ class TravelReportApprovalController extends Controller
             'travelReport.user.roles',
             'travelReport.activities.documents',
             'travelReport.approvals.approver',
+            'travelReport.approvals.approvalStep.role',
+            'approvalStep.role',
         ]);
 
         return view('travel-report-approvals.show', compact('travelReportApproval'));
@@ -98,8 +100,9 @@ class TravelReportApprovalController extends Controller
                 if ($nextStep) {
                     TravelReportApproval::create([
                         'travel_report_id' => $travelReport->id,
-                        'step' => $nextStep,
-                        'step_order' => $this->workflow->getStepOrder($nextStep),
+                        'approval_step_id' => $nextStep->id,
+                        'step' => $nextStep->role?->slug ?? ('level' . $nextStep->required_level),
+                        'step_order' => $nextStep->step_order,
                         'status' => 'pending',
                     ]);
                 } else {

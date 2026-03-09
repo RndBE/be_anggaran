@@ -2,14 +2,14 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="text-xl font-bold text-foreground">{{ __('Reports & Audit Logs') }}</h2>
-                <p class="text-sm text-muted-foreground mt-0.5">Overview semua pengajuan dalam sistem</p>
+                <h2 class="text-xl font-bold text-foreground">{{ __('Laporan & Log Audit') }}</h2>
+                <p class="text-sm text-muted-foreground mt-0.5">Ringkasan semua pengajuan dalam sistem</p>
             </div>
             <a href="{{ route('reports.export') }}" class="btn-secondary btn-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                 </svg>
-                Export CSV
+                Ekspor CSV
             </a>
         </div>
     </x-slot>
@@ -18,23 +18,23 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="card overflow-hidden">
                 <div class="px-6 py-4 border-b border-border">
-                    <h3 class="card-title">All Requests Overview</h3>
+                    <h3 class="card-title">Ringkasan Semua Pengajuan</h3>
                 </div>
                 <div class="table-wrapper">
                     <table class="table w-full">
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Requestor</th>
-                                <th>Client Code</th>
-                                <th>Type</th>
+                                <th>Pemohon</th>
+                                <th>Kode Klien</th>
+                                <th>Tipe</th>
                                 <th>Total</th>
                                 <th>Status</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($requests as $req)
+                            @forelse($requests as $req)
                                 <tr>
                                     <td class="font-mono text-xs text-muted-foreground">REQ-{{ str_pad($req->id, 4, '0', STR_PAD_LEFT) }}</td>
                                     <td class="font-medium text-foreground">{{ $req->user->name }}</td>
@@ -72,7 +72,17 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="7" class="py-12 text-center">
+                                        <svg class="w-10 h-10 mx-auto mb-3 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <p class="text-sm text-muted-foreground">Belum ada pengajuan dalam sistem.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

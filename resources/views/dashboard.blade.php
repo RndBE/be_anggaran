@@ -24,7 +24,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 @php
                 $statCards = [
-                    ['label' => 'Total Requests', 'value' => number_format($systemStats['total_requests']), 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color' => 'text-primary bg-primary/10', 'valueClass' => 'text-foreground'],
+                    ['label' => 'Total Pengajuan', 'value' => number_format($systemStats['total_requests']), 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', 'color' => 'text-primary bg-primary/10', 'valueClass' => 'text-foreground'],
                     ['label' => 'Menunggu Approval', 'value' => number_format($systemStats['pending']), 'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'text-amber-600 bg-amber-50', 'valueClass' => 'text-amber-600'],
                     ['label' => 'Disetujui', 'value' => number_format($systemStats['approved']), 'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'text-green-600 bg-green-50', 'valueClass' => 'text-green-600'],
                     ['label' => 'Total Disetujui', 'value' => 'Rp '.number_format($systemStats['approved_amount']/1000000, 1).'Jt', 'icon' => 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', 'color' => 'text-blue-600 bg-blue-50', 'valueClass' => 'text-blue-700'],
@@ -48,11 +48,11 @@
             {{-- Pipeline + Spending --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="lg:col-span-2 card p-6">
-                    <h3 class="card-title mb-4">Pipeline Requests</h3>
+                    <h3 class="card-title mb-4">Alur Pengajuan</h3>
                     @php
                         $total = max($systemStats['total_requests'], 1);
                         $pipeline = [
-                            ['label' => 'Pending', 'count' => $systemStats['pending'], 'color' => 'bg-amber-400', 'text' => 'text-amber-700'],
+                            ['label' => 'Menunggu', 'count' => $systemStats['pending'], 'color' => 'bg-amber-400', 'text' => 'text-amber-700'],
                             ['label' => 'Disetujui', 'count' => $systemStats['approved'], 'color' => 'bg-green-400', 'text' => 'text-green-700'],
                             ['label' => 'Ditolak', 'count' => $systemStats['rejected'], 'color' => 'bg-red-400', 'text' => 'text-red-700'],
                             ['label' => 'Revisi', 'count' => $systemStats['revision'], 'color' => 'bg-purple-400', 'text' => 'text-purple-700'],
@@ -130,8 +130,8 @@
                     </div>
                     @php
                         $statusConfig = [
-                            'submitted'          => ['label' => 'Submitted', 'badge' => 'badge-info'],
-                            'pending'            => ['label' => 'Pending', 'badge' => 'badge-warning'],
+                            'submitted'          => ['label' => 'Diajukan', 'badge' => 'badge-info'],
+                            'pending'            => ['label' => 'Menunggu', 'badge' => 'badge-warning'],
                             'approved'           => ['label' => 'Disetujui', 'badge' => 'badge-success'],
                             'rejected'           => ['label' => 'Ditolak', 'badge' => 'badge-destructive'],
                             'revision_requested' => ['label' => 'Revisi', 'badge' => 'badge-purple'],
@@ -220,10 +220,10 @@
                                 @foreach($recentRequests as $req)
                                     @php
                                         $badgeMap = [
-                                            'submitted'          => ['label' => 'Submitted', 'class' => 'badge-info'],
-                                            'pending'            => ['label' => 'Pending', 'class' => 'badge-warning'],
-                                            'approved'           => ['label' => 'Approved', 'class' => 'badge-success'],
-                                            'rejected'           => ['label' => 'Rejected', 'class' => 'badge-destructive'],
+                                            'submitted'          => ['label' => 'Diajukan', 'class' => 'badge-info'],
+                                            'pending'            => ['label' => 'Menunggu', 'class' => 'badge-warning'],
+                                            'approved'           => ['label' => 'Disetujui', 'class' => 'badge-success'],
+                                            'rejected'           => ['label' => 'Ditolak', 'class' => 'badge-destructive'],
                                             'revision_requested' => ['label' => 'Revisi', 'class' => 'badge-purple'],
                                         ];
                                         $badge = $badgeMap[$req->status] ?? ['label' => $req->status, 'class' => 'badge-secondary'];

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h2 class="text-xl font-bold text-foreground">{{ __('My Requests') }}</h2>
+                <h2 class="text-xl font-bold text-foreground">{{ __('Pengajuan Saya') }}</h2>
                 <p class="text-sm text-muted-foreground mt-0.5">Daftar pengajuan anggaran dan reimbursement</p>
             </div>
             @auth
@@ -11,7 +11,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
-                        New Request
+                        Pengajuan Baru
                     </a>
                 @endif
             @endauth
@@ -35,12 +35,12 @@
                     <table class="table w-full">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Title</th>
-                                <th>Type</th>
-                                <th>Total Amount</th>
+                                <th>Tanggal</th>
+                                <th>Judul</th>
+                                <th>Tipe</th>
+                                <th>Jumlah</th>
                                 <th>Status</th>
-                                <th>Actions</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -74,10 +74,11 @@
                                     </td>
                                     <td class="whitespace-nowrap">
                                         <div class="flex items-center gap-2">
-                                            <a href="{{ route('requests.show', $req) }}" class="btn-outline btn-sm">View</a>
+                                            <a href="{{ route('requests.show', $req) }}"
+                                                class="btn-outline btn-sm">Lihat</a>
                                             @if($req->status === 'draft' || $req->status === 'revision_requested')
                                                 <a href="{{ route('requests.edit', $req) }}"
-                                                    class="btn-secondary btn-sm">Edit</a>
+                                                    class="btn-secondary btn-sm">Ubah</a>
                                             @endif
                                             @php
                                                 $deletableStatuses = ['draft', 'submitted', 'revision_requested'];
@@ -103,9 +104,9 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
-                                        <p class="text-sm text-muted-foreground">No requests found.
+                                        <p class="text-sm text-muted-foreground">Belum ada pengajuan.
                                             <a href="{{ route('requests.create') }}"
-                                                class="text-primary hover:underline">Create one now →</a>
+                                                class="text-primary hover:underline">Buat sekarang →</a>
                                         </p>
                                     </td>
                                 </tr>

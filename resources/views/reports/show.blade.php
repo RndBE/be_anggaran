@@ -9,7 +9,7 @@
                     </svg>
                 </a>
                 <div>
-                    <h2 class="text-xl font-bold text-foreground">Detail Report</h2>
+                    <h2 class="text-xl font-bold text-foreground">Detail Laporan</h2>
                     <p class="text-sm text-muted-foreground font-mono">
                         REQ-{{ str_pad($report->id, 4, '0', STR_PAD_LEFT) }}</p>
                 </div>
@@ -62,7 +62,7 @@
                             <span class="badge-secondary mt-1 capitalize">{{ $report->type }}</span>
                         </div>
                         <div>
-                            <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Client Code
+                            <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kode Klien
                             </p>
                             <p class="text-sm text-foreground mt-1">
                                 {{ $report->clientCode ? $report->clientCode->prefix . '-' . $report->clientCode->instansi_singkat : '—' }}

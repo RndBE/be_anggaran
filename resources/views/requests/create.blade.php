@@ -27,13 +27,13 @@
                     <!-- Basic Information -->
                     <div class="card p-6 space-y-4">
                         <div>
-                            <h3 class="card-title">Basic Info</h3>
+                            <h3 class="card-title">Informasi Dasar</h3>
                             <p class="card-description mt-1">Informasi dasar pengajuan</p>
                         </div>
                         <div class="separator"></div>
 
                         <div class="form-group">
-                            <x-input-label for="type">Type of Request</x-input-label>
+                            <x-input-label for="type">Tipe Pengajuan</x-input-label>
                             <select name="type" id="type" x-model="requestType" class="select-input" required>
                                 <option value="budget">Pengajuan Anggaran (Budget)</option>
                                 <option value="reimbursement">Reimbursement (Akomodasi/Entertain)</option>
@@ -41,27 +41,28 @@
                         </div>
 
                         <div class="form-group">
-                            <x-input-label for="title">Request Title</x-input-label>
+                            <x-input-label for="title">Judul Pengajuan</x-input-label>
                             <x-text-input id="title" type="text" name="title"
                                 placeholder="e.g. Perjalanan Dinas Surabaya" required value="{{ old('title') }}" />
                         </div>
 
                         <div class="form-group">
-                            <x-input-label for="client_code_id">Client Code</x-input-label>
+                            <x-input-label for="client_code_id">Kode Klien</x-input-label>
                             <select name="client_code_id" id="client_code_id" class="select-input" required>
-                                <option value="">-- Select Client Code --</option>
+                                <option value="">-- Pilih Kode Klien --</option>
                                 @foreach($clientCodes as $client)
                                     <option value="{{ $client->id }}">{{ $client->prefix }}-{{ $client->instansi_singkat }}
                                     </option>
                                 @endforeach
                             </select>
-                            <p class="text-xs text-destructive italic">Do not type raw client names in descriptions!</p>
+                            <p class="text-xs text-destructive italic">Jangan mengetik nama klien langsung di deskripsi!
+                            </p>
                         </div>
 
                         <div class="form-group">
-                            <x-input-label for="description">Description / Goal</x-input-label>
+                            <x-input-label for="description">Deskripsi / Tujuan</x-input-label>
                             <textarea name="description" id="description" rows="3" class="textarea"
-                                placeholder="Enter purpose of visit or goal">{{ old('description') }}</textarea>
+                                placeholder="Masukkan tujuan kunjungan atau keperluan">{{ old('description') }}</textarea>
                         </div>
 
                         <!-- Surat Tugas Number -->

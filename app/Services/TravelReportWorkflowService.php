@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\ApprovalFlow;
+use App\Models\ApprovalStep;
 use App\Models\TravelReport;
 use App\Models\TravelReportApproval;
 use App\Models\User;
@@ -9,38 +11,49 @@ use App\Models\User;
 class TravelReportWorkflowService
 {
     /**
-     * The full ordered step chain.
+     * Get the active LHP approval flow from the database.
+     * Falls back to null if none is configured.
      */
-    private const STEP_CHAIN = ['level3', 'level2', 'k3', 'hrd', 'finance'];
+    public function getActiveFlow(): ?ApprovalFlow
+    {
+        return ApprovalFlow::where('flow_type', 'lhp')
+            ->where('is_active', true)
+            ->with('steps.role')
+            ->first();
+    }
 
     /**
-     * Get the next step key to create approval for, or null if chain is complete.
-     * Applies skip rules:
-     *   - Level-based steps: skip if submitter's level is <= the step's required level
-     *     (submitter IS already at that level or higher — self/peer approval is pointless)
+     * Get the next step to create approval for, or null if chain is complete.
+     * Reads from DB-configured flow. Applies skip rules:
+     *   - Division-level steps: skip if submitter's level <= required level
      *   - Role-based steps: skip if no user has the required role
      */
-    public function getNextStep(TravelReport $report): ?string
+    public function getNextStep(TravelReport $report): ?ApprovalStep
     {
+        $flow = $this->getActiveFlow();
+        if (!$flow) {
+            return null; // No flow configured
+        }
+
         $submitter = $report->user;
 
-        $approvedSteps = $report->approvals()
+        // Get step IDs that are already approved
+        $approvedStepIds = $report->approvals()
             ->where('status', 'approved')
-            ->pluck('step')
+            ->pluck('approval_step_id')
             ->toArray();
 
-        foreach (self::STEP_CHAIN as $stepKey) {
+        foreach ($flow->steps as $step) {
             // Already approved — skip
-            if (in_array($stepKey, $approvedSteps)) {
+            if (in_array($step->id, $approvedStepIds)) {
                 continue;
             }
 
-            $stepDef = TravelReportApproval::STEPS[$stepKey];
+            // Division-level step (no role, just level requirement)
+            if ($step->isDivisionLevel()) {
+                $requiredLevel = $step->required_level;
 
-            if ($stepDef['type'] === 'level') {
-                $requiredLevel = $stepDef['value'];
-
-                // Skip if submitter is already at this level or higher (lower number = higher rank)
+                // Skip if submitter is already at this level or higher
                 if ($submitter && $submitter->level !== null && $submitter->level <= $requiredLevel) {
                     continue;
                 }
@@ -57,52 +70,57 @@ class TravelReportWorkflowService
                 }
             }
 
-            if ($stepDef['type'] === 'role') {
-                // Skip if no user has the required role
-                $roleSlug = $stepDef['value'];
-                $eligible = User::whereHas('roles', fn($q) => $q->where('slug', $roleSlug))->exists();
-                if (!$eligible) {
-                    continue;
+            // Role-level step (with or without level constraint)
+            if ($step->role_id) {
+                $roleSlug = $step->role->slug ?? null;
+                if ($roleSlug) {
+                    $query = User::whereHas('roles', fn($q) => $q->where('slug', $roleSlug));
+
+                    // If also has level requirement (isRoleLevel)
+                    if ($step->isRoleLevel()) {
+                        $query->where('level', '<=', $step->required_level);
+                    }
+
+                    if (!$query->exists()) {
+                        continue;
+                    }
                 }
             }
 
-            return $stepKey;
+            return $step; // This is the next pending step
         }
 
         return null; // Chain complete
     }
 
     /**
-     * Determine if a user can process a given approval based on step type.
+     * Determine if a user can process a given approval based on step definition.
      */
     public function canApprove(User $user, TravelReportApproval $approval): bool
     {
-        $stepDef = TravelReportApproval::STEPS[$approval->step] ?? null;
-        if (!$stepDef)
+        $step = $approval->approvalStep;
+        if (!$step) {
             return false;
+        }
 
-        if ($stepDef['type'] === 'level') {
-            $requiredLevel = $stepDef['value'];
+        // Division-level step
+        if ($step->isDivisionLevel()) {
             $submitter = $approval->travelReport->user;
-
             return $user->division_id === $submitter->division_id
                 && $user->level !== null
-                && $user->level <= $requiredLevel
+                && $user->level <= $step->required_level
                 && $user->id !== $submitter->id;
         }
 
-        if ($stepDef['type'] === 'role') {
-            return $user->hasRole($stepDef['value']);
+        // Role-based step (with or without level)
+        if ($step->role_id) {
+            $hasRole = $user->hasRole($step->role->slug);
+            if ($step->isRoleLevel()) {
+                return $hasRole && $user->level !== null && $user->level <= $step->required_level;
+            }
+            return $hasRole;
         }
 
         return false;
-    }
-
-    /**
-     * Get the step_order for a given step key.
-     */
-    public function getStepOrder(string $stepKey): int
-    {
-        return TravelReportApproval::STEPS[$stepKey]['order'] ?? 99;
     }
 }

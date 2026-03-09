@@ -33,6 +33,7 @@ class SettingsController extends Controller
             'name' => 'required|string',
             'description' => 'nullable|string',
             'division_id' => 'nullable|exists:divisions,id',
+            'flow_type' => 'nullable|string|in:request,lhp',
             'steps' => 'required|array',
         ]);
 
@@ -41,6 +42,7 @@ class SettingsController extends Controller
                 'name' => $request->name,
                 'description' => $request->description,
                 'division_id' => $request->division_id,
+                'flow_type' => $request->flow_type ?? 'request', // Added flow_type
                 'is_active' => true,
             ]);
 
@@ -54,7 +56,7 @@ class SettingsController extends Controller
             }
         });
 
-        return redirect()->route('settings.flows')->with('success', 'New Approval Flow Created.');
+        return redirect()->route('settings.flows')->with('success', 'Alur persetujuan baru berhasil dibuat.');
     }
 
     public function editFlow(\App\Models\ApprovalFlow $flow)
@@ -93,7 +95,7 @@ class SettingsController extends Controller
             }
         });
 
-        return redirect()->route('settings.flows')->with('success', 'Approval Flow updated successfully.');
+        return redirect()->route('settings.flows')->with('success', 'Alur persetujuan berhasil diperbarui.');
     }
 
     public function destroyFlow(\App\Models\ApprovalFlow $flow)
@@ -102,13 +104,13 @@ class SettingsController extends Controller
         $inUse = $flow->steps()->whereHas('approvals', fn($q) => $q->where('status', 'pending'))->exists();
 
         if ($inUse) {
-            return back()->withErrors(['error' => 'Cannot delete this flow — it has pending approvals in progress.']);
+            return back()->withErrors(['error' => 'Tidak bisa menghapus alur ini — masih ada persetujuan yang sedang berjalan.']);
         }
 
         $flow->steps()->delete();
         $flow->delete();
 
-        return redirect()->route('settings.flows')->with('success', 'Approval Flow deleted.');
+        return redirect()->route('settings.flows')->with('success', 'Alur persetujuan berhasil dihapus.');
     }
 
     public function permissions()

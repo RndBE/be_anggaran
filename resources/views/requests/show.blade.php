@@ -9,7 +9,7 @@
             </a>
             <div>
                 <h2 class="text-xl font-bold text-foreground">{{ $request->title }}</h2>
-                <p class="text-sm text-muted-foreground mt-0.5">Request Details</p>
+                <p class="text-sm text-muted-foreground mt-0.5">Detail Pengajuan</p>
             </div>
         </div>
     </x-slot>
@@ -24,7 +24,7 @@
                     <div class="card p-6">
                         <div class="flex justify-between items-start mb-4">
                             <div>
-                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Type</p>
+                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tipe</p>
                                 <p class="text-lg font-semibold text-foreground mt-1">{{ ucfirst($request->type) }}</p>
                             </div>
                             <div class="text-right">
@@ -46,8 +46,7 @@
                         <div class="separator mb-4"></div>
                         <div class="grid grid-cols-2 gap-6">
                             <div>
-                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Client
-                                    Code</p>
+                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Kode Klien</p>
                                 <p
                                     class="mt-1 font-medium text-foreground bg-muted/50 px-3 py-1.5 rounded-md inline-block text-sm border border-border">
                                     {{ $request->clientCode ? $request->clientCode->prefix . '-' . $request->clientCode->instansi_singkat : 'N/A' }}
@@ -55,14 +54,14 @@
                             </div>
                             <div>
                                 <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total
-                                    Amount</p>
+                                    Jumlah</p>
                                 <p class="text-2xl font-bold text-primary mt-1">Rp
                                     {{ number_format($request->total_amount, 0, ',', '.') }}</p>
                             </div>
                         </div>
                         @if($request->description)
                             <div class="mt-4">
-                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Description
+                                <p class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Deskripsi
                                 </p>
                                 <p class="mt-1 text-sm text-foreground leading-relaxed">{{ $request->description }}</p>
                             </div>
@@ -72,7 +71,7 @@
                     <!-- Line Items -->
                     <div class="card overflow-hidden">
                         <div class="px-6 py-4 border-b border-border">
-                            <h3 class="card-title">Line Items</h3>
+                            <h3 class="card-title">Daftar Item</h3>
                         </div>
                         <div class="divide-y divide-border">
                             @foreach($request->items as $item)
@@ -91,7 +90,7 @@
                                     <p class="text-sm text-muted-foreground">{{ $item->description }}</p>
                                     @if($item->attachments->count() > 0)
                                         <div class="mt-3 pt-3 border-t border-border">
-                                            <p class="text-xs font-semibold text-muted-foreground uppercase mb-2">Attachments
+                                            <p class="text-xs font-semibold text-muted-foreground uppercase mb-2">Lampiran
                                             </p>
                                             <div class="flex gap-2 flex-wrap">
                                                 @foreach($item->attachments as $att)
@@ -102,7 +101,7 @@
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                                 d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                         </svg>
-                                                        View File
+                                                        Lihat File
                                                     </a>
                                                 @endforeach
                                             </div>
@@ -117,17 +116,17 @@
                 <!-- Right: Approval Timeline -->
                 <div>
                     <div class="card p-6 sticky top-20">
-                        <h3 class="card-title mb-5">Approval Timeline</h3>
+                        <h3 class="card-title mb-5">Riwayat Persetujuan</h3>
                         <div class="space-y-5">
                             <!-- Submit node -->
                             <div class="relative pl-6 border-l-2 border-primary/30">
                                 <div
                                     class="absolute -left-[9px] top-1 h-4 w-4 rounded-full bg-primary ring-4 ring-background">
                                 </div>
-                                <p class="text-sm font-semibold text-foreground">Submitted</p>
+                                <p class="text-sm font-semibold text-foreground">Diajukan</p>
                                 <p class="text-xs text-muted-foreground">
                                     {{ $request->created_at->format('d M Y, H:i') }}</p>
-                                <p class="text-xs text-primary mt-0.5">By: {{ $request->user->name }}</p>
+                                <p class="text-xs text-primary mt-0.5">Oleh: {{ $request->user->name }}</p>
                             </div>
 
                             @foreach($request->approvals as $approval)
@@ -162,7 +161,7 @@
                                     @if($approval->approver)
                                         <p class="text-xs text-muted-foreground mt-0.5">
                                             {{ $approval->updated_at->format('d M Y, H:i') }}</p>
-                                        <p class="text-xs text-muted-foreground">By: {{ $approval->approver->name }}</p>
+                                        <p class="text-xs text-muted-foreground">Oleh: {{ $approval->approver->name }}</p>
                                     @endif
                                     @if($approval->comments)
                                         <div

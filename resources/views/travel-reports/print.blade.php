@@ -647,15 +647,8 @@
 
         {{-- TANDA TANGAN --}}
         @php
-            $approvalMap = $travelReport->approvals->keyBy('step');
-
-            $sigBlocks = [
-                'level3' => 'Supervisor',
-                'level2' => 'Manager',
-                'k3' => 'K3',
-                'hrd' => 'HRD',
-            ];
-            $financeApproval = $approvalMap->get('finance');
+            // Sort approvals by step_order for display
+            $sortedApprovals = $travelReport->approvals->sortBy('step_order');
         @endphp
         <div class="signature-section">
             <div class="signature-pembuat">
@@ -671,49 +664,28 @@
 
             <div class="approval-title">Mengetahui dan menyetujui.</div>
             <div class="approval-grid">
-                @foreach($sigBlocks as $step => $label)
-                    @php $ap = $approvalMap->get($step); @endphp
+                @foreach($sortedApprovals as $ap)
                     <div class="approval-block">
-                        <div class="role-title">{{ $label }}</div>
-                        @if($ap && $ap->status === 'approved' && $ap->approver)
+                        <div class="role-title">{{ $ap->step_label }}</div>
+                        @if($ap->status === 'approved' && $ap->approver)
                             <div style="font-style:italic;font-size:9pt;color:#555;">{{ $ap->updated_at->format('d M Y') }}
                             </div>
                             <div class="sign-space">
                                 @if($ap->approver->signature)
-                                    <img src="{{ asset('storage/' . $ap->approver->signature) }}" alt="TTD {{ $label }}">
+                                    <img src="{{ asset('storage/' . $ap->approver->signature) }}" alt="TTD {{ $ap->step_label }}">
                                 @endif
                             </div>
                             <div class="sign-line"></div>
                             <div class="sign-name">{{ $ap->approver->name }}</div>
                         @else
                             <div style="font-style:italic;font-size:9pt;color:#999;">
-                                {{ ($ap && $ap->status === 'pending') ? '(menunggu)' : '(tidak diperlukan)' }}
+                                {{ $ap->status === 'pending' ? '(menunggu)' : '(tidak diperlukan)' }}
                             </div>
                             <div class="sign-space"></div>
                             <div class="sign-line"></div>
                         @endif
                     </div>
                 @endforeach
-            </div>
-            <div class="approval-single">
-                <div class="role-title">Finance</div>
-                @if($financeApproval && $financeApproval->status === 'approved' && $financeApproval->approver)
-                    <div style="font-style:italic;font-size:9pt;color:#555;">
-                        {{ $financeApproval->updated_at->format('d M Y') }}</div>
-                    <div class="sign-space">
-                        @if($financeApproval->approver->signature)
-                            <img src="{{ asset('storage/' . $financeApproval->approver->signature) }}" alt="TTD Finance">
-                        @endif
-                    </div>
-                    <div class="sign-line"></div>
-                    <div class="sign-name">{{ $financeApproval->approver->name }}</div>
-                @else
-                    <div style="font-style:italic;font-size:9pt;color:#999;">
-                        {{ ($financeApproval && $financeApproval->status === 'pending') ? '(menunggu)' : '(tidak diperlukan)' }}
-                    </div>
-                    <div class="sign-space"></div>
-                    <div class="sign-line"></div>
-                @endif
             </div>
         </div>
 

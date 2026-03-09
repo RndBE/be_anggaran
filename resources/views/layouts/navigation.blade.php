@@ -18,11 +18,11 @@
                     </x-nav-link>
                     <x-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">
                         <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        {{ __('Requests') }}
+                        {{ __('Pengajuan') }}
                     </x-nav-link>
                     <x-nav-link :href="route('approvals.index')" :active="request()->routeIs('approvals.*')">
                         <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        {{ __('Approvals') }}
+                        {{ __('Persetujuan') }}
                     </x-nav-link>
                     <x-nav-link :href="route('travel-report-approvals.index')" :active="request()->routeIs('travel-report-approvals.*')">
                         <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5-4H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2h-1"/></svg>
@@ -37,7 +37,7 @@
                         @if(Auth::user()->hasPermission('reports.view'))
                             <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
                                 <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                {{ __('Reports') }}
+                                {{ __('Laporan') }}
                             </x-nav-link>
                         @endif
 
@@ -47,7 +47,7 @@
                                     class="inline-flex items-center gap-1.5 px-1 h-full border-b-2 text-sm font-medium leading-5 transition duration-150 ease-in-out focus:outline-none
                                         {{ request()->routeIs('settings.*') ? 'border-primary text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border' }}">
                                     <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    {{ __('Settings') }}
+                                    {{ __('Pengaturan') }}
                                     <svg class="w-3 h-3 transition-transform duration-200" :class="{ 'rotate-180': settingsOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                                 </button>
 
@@ -66,10 +66,10 @@
                                         <p class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Manajemen</p>
                                     </div>
                                     @foreach([
-                                        ['route' => 'settings.users.index', 'label' => 'Users', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
-                                        ['route' => 'settings.divisions.index', 'label' => 'Divisions', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
-                                        ['route' => 'settings.roles.index', 'label' => 'Roles', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
-                                        ['route' => 'settings.permissions', 'label' => 'Permissions', 'icon' => 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z'],
+                                        ['route' => 'settings.users.index', 'label' => 'Pengguna', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
+                                        ['route' => 'settings.divisions.index', 'label' => 'Divisi', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
+                                        ['route' => 'settings.roles.index', 'label' => 'Peran', 'icon' => 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z'],
+                                        ['route' => 'settings.permissions', 'label' => 'Hak Akses', 'icon' => 'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z'],
                                     ] as $item)
                                         <a href="{{ route($item['route']) }}"
                                             class="flex items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors
@@ -87,10 +87,10 @@
                                         <p class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Konfigurasi</p>
                                     </div>
                                     @foreach([
-                                        ['route' => 'settings.flows', 'label' => 'Flow Builder', 'icon' => 'M4 6h16M4 12h8m-8 6h16'],
-                                        ['route' => 'settings.policies.index', 'label' => 'Policies', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
-                                        ['route' => 'settings.travel-zones.index', 'label' => 'Travel Zones', 'icon' => 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8'],
-                                        ['route' => 'settings.client-codes.index', 'label' => 'Client Codes', 'icon' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a2 2 0 012-2z'],
+                                        ['route' => 'settings.flows', 'label' => 'Alur Persetujuan', 'icon' => 'M4 6h16M4 12h8m-8 6h16'],
+                                        ['route' => 'settings.policies.index', 'label' => 'Kebijakan', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                                        ['route' => 'settings.travel-zones.index', 'label' => 'Zona Perjalanan', 'icon' => 'M12 19l9 2-9-18-9 18 9-2zm0 0v-8'],
+                                        ['route' => 'settings.client-codes.index', 'label' => 'Kode Klien', 'icon' => 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a2 2 0 012-2z'],
                                         ['route' => 'settings.audit-logs.index', 'label' => 'Audit Log', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
                                     ] as $item)
                                         <a href="{{ route($item['route']) }}"
@@ -133,13 +133,13 @@
                         </div>
                         <x-dropdown-link :href="route('profile.edit')">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            {{ __('Profile') }}
+                            {{ __('Profil') }}
                         </x-dropdown-link>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                                {{ __('Log Out') }}
+                                {{ __('Keluar') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -168,10 +168,10 @@
                 🏠 {{ __('Dashboard') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">
-                📄 {{ __('Requests') }}
+                📄 {{ __('Pengajuan') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('approvals.index')" :active="request()->routeIs('approvals.*')">
-                ✅ {{ __('Approvals') }}
+                ✅ {{ __('Persetujuan') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('travel-reports.index')" :active="request()->routeIs('travel-reports.*')">
                 📋 {{ __('LHP') }}
@@ -180,35 +180,35 @@
             @auth
                 @if(Auth::user()->hasPermission('reports.view'))
                     <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
-                        📊 {{ __('Reports') }}
+                        📊 {{ __('Laporan') }}
                     </x-responsive-nav-link>
                 @endif
 
                 @if(Auth::user()->hasPermission('settings.manage'))
-                    <div class="pt-2 pb-1 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Settings</div>
+                    <div class="pt-2 pb-1 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pengaturan</div>
                     <x-responsive-nav-link :href="route('settings.users.index')" :active="request()->routeIs('settings.users.*')">
-                        &ensp;👤 Users
+                        &ensp;👤 Pengguna
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.divisions.index')" :active="request()->routeIs('settings.divisions.*')">
-                        &ensp;🏢 Divisions
+                        &ensp;🏢 Divisi
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.roles.index')" :active="request()->routeIs('settings.roles.*')">
-                        &ensp;🛡 Roles
+                        &ensp;🛡 Peran
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.permissions')" :active="request()->routeIs('settings.permissions')">
-                        &ensp;🔑 Permissions
+                        &ensp;🔑 Hak Akses
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.flows')" :active="request()->routeIs('settings.flows')">
-                        &ensp;⚙ Flow Builder
+                        &ensp;⚙ Alur Persetujuan
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.policies.index')" :active="request()->routeIs('settings.policies.*')">
-                        &ensp;📋 Policies
+                        &ensp;📋 Kebijakan
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.travel-zones.index')" :active="request()->routeIs('settings.travel-zones.*')">
-                        &ensp;✈ Travel Zones
+                        &ensp;✈ Zona Perjalanan
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.client-codes.index')" :active="request()->routeIs('settings.client-codes.*')">
-                        &ensp;🏷 Client Codes
+                        &ensp;🏷 Kode Klien
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('settings.audit-logs.index')" :active="request()->routeIs('settings.audit-logs.*')">
                         &ensp;📋 Audit Log
@@ -231,12 +231,12 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    {{ __('Profil') }}
                 </x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
+                        {{ __('Keluar') }}
                     </x-responsive-nav-link>
                 </form>
             </div>

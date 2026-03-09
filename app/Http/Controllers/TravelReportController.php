@@ -153,8 +153,9 @@ class TravelReportController extends Controller
             if ($firstStep) {
                 TravelReportApproval::create([
                     'travel_report_id' => $report->id,
-                    'step' => $firstStep,
-                    'step_order' => $this->workflow->getStepOrder($firstStep),
+                    'approval_step_id' => $firstStep->id,
+                    'step' => $firstStep->role?->slug ?? ('level' . $firstStep->required_level),
+                    'step_order' => $firstStep->step_order,
                     'status' => 'pending',
                 ]);
             } else {
@@ -204,6 +205,7 @@ class TravelReportController extends Controller
             'activities.documents',
             'documents',
             'approvals.approver',
+            'approvals.approvalStep.role',
         ]);
 
         return view('travel-reports.print', compact('travelReport'));

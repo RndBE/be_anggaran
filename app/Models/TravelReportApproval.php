@@ -8,18 +8,6 @@ class TravelReportApproval extends Model
 {
     protected $guarded = [];
 
-    /**
-     * Ordered steps for LHP approval chain.
-     * key => [label, type: 'level'|'role', value: level number or role slug]
-     */
-    public const STEPS = [
-        'level3' => ['label' => 'Supervisor (Level 3)', 'type' => 'level', 'value' => 3, 'order' => 1],
-        'level2' => ['label' => 'Manager (Level 2)', 'type' => 'level', 'value' => 2, 'order' => 2],
-        'k3' => ['label' => 'K3', 'type' => 'role', 'value' => 'k3', 'order' => 3],
-        'hrd' => ['label' => 'HRD', 'type' => 'role', 'value' => 'hrd', 'order' => 4],
-        'finance' => ['label' => 'Finance', 'type' => 'role', 'value' => 'finance', 'order' => 5],
-    ];
-
     public function travelReport()
     {
         return $this->belongsTo(TravelReport::class);
@@ -30,8 +18,38 @@ class TravelReportApproval extends Model
         return $this->belongsTo(User::class, 'approver_id');
     }
 
+    /**
+     * Link to the dynamic approval step from approval_steps table.
+     */
+    public function approvalStep()
+    {
+        return $this->belongsTo(ApprovalStep::class, 'approval_step_id');
+    }
+
+    /**
+     * Get the human-readable label for this step.
+     */
     public function getStepLabelAttribute(): string
     {
-        return self::STEPS[$this->step]['label'] ?? $this->step;
+        if ($this->approvalStep) {
+            $step = $this->approvalStep;
+            if ($step->isDivisionLevel()) {
+                return 'Level ≤ ' . $step->required_level . ' (Divisi)';
+            } elseif ($step->isRoleLevel()) {
+                return ($step->role?->name ?? '—') . ' (Level ≤ ' . $step->required_level . ')';
+            } else {
+                return $step->role?->name ?? '—';
+            }
+        }
+
+        // Legacy fallback for old hardcoded steps
+        $legacyLabels = [
+            'level3' => 'Supervisor (Level 3)',
+            'level2' => 'Manager (Level 2)',
+            'k3' => 'K3',
+            'hrd' => 'HRD',
+            'finance' => 'Finance',
+        ];
+        return $legacyLabels[$this->step] ?? $this->step ?? '—';
     }
 }
