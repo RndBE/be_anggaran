@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             PolicySeeder::class,
             ApprovalFlowSeeder::class,
+            LhpApprovalFlowSeeder::class,
         ]);
     }
 }
