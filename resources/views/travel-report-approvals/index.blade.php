@@ -15,8 +15,8 @@
 
             {{-- PENDING --}}
             <div class="card">
-                <div class="p-6 border-b border-border">
-                    <h3 class="card-title">⏳ Menunggu Persetujuan Anda</h3>
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="card-title">Menunggu Persetujuan Anda</h3>
                 </div>
                 @if($pending->isEmpty())
                     <div class="p-8 text-center text-muted-foreground">
